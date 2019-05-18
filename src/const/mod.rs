@@ -89,9 +89,9 @@ pub const MAX_ROOMS: i32 = 30;
 
 // Map
 /// Map width
-pub const MAP_WIDTH: i32 = 80;
+pub const MAP_WIDTH: i32 = SCREEN_WIDTH;
 /// Map height
-pub const MAP_HEIGHT: i32 = 33;
+pub const MAP_HEIGHT: i32 = SCREEN_HEIGHT - 7;
 
 /// RGB color of dark wall
 pub const COLOR_DARK_WALL: Color = Color {

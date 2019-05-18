@@ -4,6 +4,7 @@ use crate::r#const::FLOOR;
 
 // Object in the game
 #[derive(Serialize, Deserialize, Debug)]
+/// An object in the game
 pub struct Object {
     pub x: i32,
     pub y: i32,
@@ -34,6 +35,7 @@ impl Object {
         }
     }
 
+    /// Returns the max_hp of an object
     pub fn max_hp(&self, game: &Game) -> i32 {
         let base_max_hp = self.fighter.map_or(0, |f| f.base_max_hp);
         let bonus = self
@@ -43,6 +45,7 @@ impl Object {
         base_max_hp + bonus
     }
 
+    /// Returns the current defense of an object
     pub fn defense(&self, game: &Game) -> i32 {
         let base_defense = self.fighter.map_or(0, |f| f.base_defense);
         let bonus = self
@@ -52,6 +55,8 @@ impl Object {
         base_defense + bonus
     }
 
+
+    /// Returns the current power of an object
     pub fn power(&self, game: &Game) -> i32 {
         let base_power = self.fighter.map_or(0, |f| f.base_power);
         let bonus = self
@@ -124,6 +129,8 @@ impl Object {
             }
         }
     }
+
+    /// Attack another object and add messages to the log
     pub fn attack(&mut self, target: &mut Object, game: &mut Game) {
         // a simple formula for attack damage
         let damage = self.power(game) - target.defense(game);
@@ -151,6 +158,7 @@ impl Object {
         }
     }
 
+    /// Take damage from another object
     pub fn take_damage(&mut self, damage: i32, game: &mut Game) -> Option<i32> {
         // apply damage if possible
         if let Some(fighter) = self.fighter.as_mut() {
@@ -174,14 +182,20 @@ impl Object {
         let dy = other.y - self.y;
         ((dx.pow(2) + dy.pow(2)) as f32).sqrt()
     }
+
+    /// Return the current position of and object
     pub fn pos(&self) -> (i32, i32) {
         (self.x, self.y)
     }
+
+    /// Set the position of an object
     pub fn set_pos(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;
     }
 
+
+    /// Object constructor
     pub fn new(x: i32, y: i32, char: char, name: &str, color: Color, blocks: bool) -> Self {
         Object {
             x: x,

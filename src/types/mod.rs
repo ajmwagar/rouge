@@ -26,7 +26,7 @@ pub mod slot;
 pub mod tile;
 
 // Export Types
-pub use self::deathcallback::DeathCallback;
+pub use self::eathcallback::DeathCallback;
 pub use self::item::Item;
 pub use self::object::Object;
 pub use self::rect::Rect;
