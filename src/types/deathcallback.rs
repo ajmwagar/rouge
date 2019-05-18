@@ -1,5 +1,5 @@
 use super::*;
-use crate::func::combat::{player_death, monster_death};
+use crate::func::combat::{monster_death, player_death};
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum DeathCallback {
@@ -16,4 +16,3 @@ impl DeathCallback {
         callback(object, &mut game.log);
     }
 }
-

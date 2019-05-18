@@ -1,64 +1,69 @@
+//! Types in the Rouge games
 use super::*;
-use std::io::{Read, Write};
-use std::fs::File;
 use std::error::Error;
+use std::fs::File;
+use std::io::{Read, Write};
 
+use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
 use rand::Rng;
-use rand::distributions::{Weighted, WeightedChoice, IndependentSample};
 
 use std::cmp;
 
-use tcod::console::*;
 use tcod::colors::{self, Color};
-use tcod::map::{Map as FovMap, FovAlgorithm};
+use tcod::console::*;
+use tcod::map::{FovAlgorithm, Map as FovMap};
 
 use tcod::input::Key;
-use tcod::input::{self, Event, Mouse};
 use tcod::input::KeyCode::*;
+use tcod::input::{self, Event, Mouse};
 
 // Import types
-pub mod object;
-pub mod item;
-pub mod slot;
 pub mod deathcallback;
+pub mod item;
+pub mod object;
 pub mod rect;
+pub mod slot;
 pub mod tile;
 
-
 // Export Types
-pub use self::object::Object;
-pub use self::item::Item;
-pub use self::slot::Slot;
 pub use self::deathcallback::DeathCallback;
+pub use self::item::Item;
+pub use self::object::Object;
 pub use self::rect::Rect;
+pub use self::slot::Slot;
 pub use self::tile::Tile;
-
 
 // Smaller types
 #[derive(Serialize, Deserialize, Debug)]
+/// Enemy AI types
 pub enum Ai {
     Basic,
-    Confused{previous_ai: Box<Ai>, num_turns: i32},
+    Confused {
+        previous_ai: Box<Ai>,
+        num_turns: i32,
+    },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+/// Possible Player actions
 pub enum PlayerAction {
     TookTurn,
     DidntTakeTurn,
     Exit,
 }
 
-
+/// Result of using a item
 pub enum UseResult {
     UsedUp,
     UsedAndKept,
     Cancelled,
 }
 
+/// A Type alias for the Map
 pub type Map = Vec<Vec<Tile>>;
 
+/// A Queue of Messages
 pub type Messages = Vec<(String, Color)>;
-
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 /// An object that can be equipped, yielding bonuses.
@@ -70,6 +75,7 @@ pub struct Equipment {
     pub defense_bonus: i32,
 }
 
+/// A Weighting based on a dungeon level
 pub struct Transition {
     pub level: u32,
     pub value: u32,
@@ -86,6 +92,7 @@ impl MessageLog for Messages {
 }
 
 #[derive(Serialize, Deserialize)]
+/// Main game state
 pub struct Game {
     pub map: Map,
     pub log: Messages,
@@ -94,22 +101,32 @@ pub struct Game {
 }
 
 // Cleaner params
+/// Tcod objects
 pub struct Tcod {
+    /// TCOD root
     pub root: Root,
     pub con: Offscreen,
     pub panel: Offscreen,
+    /// FOV map
     pub fov: FovMap,
+    /// Mouse location
     pub mouse: Mouse,
 }
 
-// combat-related properties and methods (monster, player, NPC).
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+/// A Fighter struct
+/// combat-related properties and methods (monster, player, NPC).
 pub struct Fighter {
+    /// Current HP of the fighter
     pub hp: i32,
+    /// Base Max HP
     pub base_max_hp: i32,
+    /// Base Defense
     pub base_defense: i32,
+    /// Base Attack power
     pub base_power: i32,
+    /// What to do on death
     pub on_death: DeathCallback,
+    /// XP gained for dying
     pub xp: i32,
-
 }

@@ -1,27 +1,34 @@
 use super::*;
-use tcod::colors::{self, Color};
 use crate::r#const::*;
 use crate::types::object::Object;
-use crate::types::slot::Slot;
-use crate::types::Map;
 use crate::types::rect::Rect;
+use crate::types::slot::Slot;
 use crate::types::tile::Tile;
+use crate::types::Map;
+use tcod::colors::{self, Color};
 
+use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
 use rand::Rng;
-use rand::distributions::{Weighted, WeightedChoice, IndependentSample};
 
 use std::cmp;
 
 use tcod::console::*;
-use tcod::map::{Map as FovMap, FovAlgorithm};
+use tcod::map::{FovAlgorithm, Map as FovMap};
 
 use tcod::input::Key;
-use tcod::input::{self, Event, Mouse};
 use tcod::input::KeyCode::*;
+use tcod::input::{self, Event, Mouse};
 
-pub fn menu<T: AsRef<str>>(header: &str, options: &[T], width: i32,
-                       root: &mut Root) -> Option<usize> {
-    assert!(options.len() <= 26, "Cannot have a menu with more than 26 options.");
+pub fn menu<T: AsRef<str>>(
+    header: &str,
+    options: &[T],
+    width: i32,
+    root: &mut Root,
+) -> Option<usize> {
+    assert!(
+        options.len() <= 26,
+        "Cannot have a menu with more than 26 options."
+    );
 
     // calculate total height for the header (after auto-wrap) and one line per option
     let header_height = root.get_height_rect(0, 0, width, SCREEN_HEIGHT, header);
@@ -32,7 +39,15 @@ pub fn menu<T: AsRef<str>>(header: &str, options: &[T], width: i32,
 
     // print the header, with auto-wrap
     window.set_default_foreground(colors::WHITE);
-    window.print_rect_ex(0, 0, width, height, BackgroundFlag::None, TextAlignment::Left, header);
+    window.print_rect_ex(
+        0,
+        0,
+        width,
+        height,
+        BackgroundFlag::None,
+        TextAlignment::Left,
+        header,
+    );
 
     // calculate total height for the header (after auto-wrap) and one line per option
     let header_height = if header.is_empty() {
@@ -45,8 +60,13 @@ pub fn menu<T: AsRef<str>>(header: &str, options: &[T], width: i32,
     for (index, option_text) in options.iter().enumerate() {
         let menu_letter = (b'a' + index as u8) as char;
         let text = format!("({}) {}", menu_letter, option_text.as_ref());
-        window.print_ex(0, header_height + index as i32,
-                        BackgroundFlag::None, TextAlignment::Left, text);
+        window.print_ex(
+            0,
+            header_height + index as i32,
+            BackgroundFlag::None,
+            TextAlignment::Left,
+            text,
+        );
     }
 
     // blit the contents of "window" to the root console
@@ -69,7 +89,6 @@ pub fn menu<T: AsRef<str>>(header: &str, options: &[T], width: i32,
     } else {
         None
     }
-
 }
 
 pub fn inventory_menu(inventory: &[Object], header: &str, root: &mut Root) -> Option<usize> {
@@ -77,15 +96,18 @@ pub fn inventory_menu(inventory: &[Object], header: &str, root: &mut Root) -> Op
     let options = if inventory.len() == 0 {
         vec!["Inventory is empty.".into()]
     } else {
-        inventory.iter().map(|item| {
+        inventory
+            .iter()
+            .map(|item| {
                 // show additional information, in case it's equipped
                 match item.equipment {
-                Some(equipment) if equipment.equipped => {
-                    format!("{} (on {})", item.name, equipment.slot)
+                    Some(equipment) if equipment.equipped => {
+                        format!("{} (on {})", item.name, equipment.slot)
+                    }
+                    _ => item.name.clone(),
                 }
-                _ => item.name.clone()
-            }
-        }).collect()
+            })
+            .collect()
     };
 
     let inventory_index = menu(header, &options, INVENTORY_WIDTH, root);
@@ -98,8 +120,6 @@ pub fn inventory_menu(inventory: &[Object], header: &str, root: &mut Root) -> Op
     }
 }
 
-
-
 /// return a string with the names of all objects under the mouse
 pub fn get_names_under_mouse(mouse: Mouse, objects: &[Object], fov_map: &FovMap) -> String {
     let (x, y) = (mouse.cx as i32, mouse.cy as i32);
@@ -107,11 +127,11 @@ pub fn get_names_under_mouse(mouse: Mouse, objects: &[Object], fov_map: &FovMap)
     // create a list with the names of all objects at the mouse's coordinates and in FOV
     let names = objects
         .iter()
-        .filter(|obj| {obj.pos() == (x, y) && fov_map.is_in_fov(obj.x, obj.y)})
+        .filter(|obj| obj.pos() == (x, y) && fov_map.is_in_fov(obj.x, obj.y))
         .map(|obj| obj.name.clone())
         .collect::<Vec<_>>();
 
-    names.join(", ")  // join the names, separated by commas
+    names.join(", ") // join the names, separated by commas
 }
 
 pub fn message<T: Into<String>>(messages: &mut Messages, message: T, color: Color) {
@@ -123,17 +143,17 @@ pub fn message<T: Into<String>>(messages: &mut Messages, message: T, color: Colo
     messages.push((message.into(), color));
 }
 
-
-pub fn render_bar(panel: &mut Offscreen,
-              x: i32,
-              y: i32,
-              total_width: i32,
-              name: &str,
-              value: i32,
-              maximum: i32,
-              bar_color: Color,
-              back_color: Color)
-{
+pub fn render_bar(
+    panel: &mut Offscreen,
+    x: i32,
+    y: i32,
+    total_width: i32,
+    name: &str,
+    value: i32,
+    maximum: i32,
+    bar_color: Color,
+    back_color: Color,
+) {
     // render a bar (HP, experience, etc). First calculate the width of the bar
     let bar_width = (value as f32 / maximum as f32 * total_width as f32) as i32;
 
@@ -149,8 +169,13 @@ pub fn render_bar(panel: &mut Offscreen,
 
     // finally, some centered text with the values
     panel.set_default_foreground(colors::WHITE);
-    panel.print_ex(x + total_width / 2, y, BackgroundFlag::None, TextAlignment::Center,
-                   &format!("{}: {}/{}", name, value, maximum));
+    panel.print_ex(
+        x + total_width / 2,
+        y,
+        BackgroundFlag::None,
+        TextAlignment::Center,
+        &format!("{}: {}/{}", name, value, maximum),
+    );
 }
 
 pub fn msgbox(text: &str, width: i32, root: &mut Root) {
@@ -177,4 +202,3 @@ pub fn create_v_tunnel(y1: i32, y2: i32, x: i32, map: &mut Map) {
         map[x as usize][y as usize] = Tile::empty();
     }
 }
-

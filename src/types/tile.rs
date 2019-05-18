@@ -7,10 +7,18 @@ pub struct Tile {
 
 impl Tile {
     pub fn empty() -> Self {
-        Tile{blocked: false, explored: false, block_sight: false}
+        Tile {
+            blocked: false,
+            explored: false,
+            block_sight: false,
+        }
     }
 
     pub fn wall() -> Self {
-        Tile{blocked: true, explored: false, block_sight: true}
+        Tile {
+            blocked: true,
+            explored: false,
+            block_sight: true,
+        }
     }
 }

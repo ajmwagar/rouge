@@ -6,11 +6,11 @@ pub enum Item {
     Confuse,
     Fireball,
     // Weapons
-    BronzeSword,  
-    IronSword,  
+    BronzeSword,
+    IronSword,
     GreatAxe,
     WarHammer,
-    WoodShield,  
+    WoodShield,
     IronShield,
     Dagger,
     // Amour
@@ -19,6 +19,5 @@ pub enum Item {
     LeatherWristGaurds,
     LeatherHat,
     LeatherChest,
-    LeatherKneeGaurds
-
+    LeatherKneeGaurds,
 }
