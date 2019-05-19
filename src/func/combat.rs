@@ -1,13 +1,11 @@
 use super::*;
-use crate::func::*;
-use crate::r#const::*;
+use crate::r#const::story::*;
 use crate::types::object::Object;
 use crate::types::Messages;
 use crate::types::Tcod;
-use crate::types::*;
 use rand::Rng;
-use tcod::colors::{self, Color};
-use tcod::input::{self, Event, Mouse};
+use tcod::colors;
+use tcod::input::{self, Event};
 
 /// returns a clicked monster inside FOV up to a range, or None if right-clicked
 pub fn target_monster(
@@ -227,7 +225,7 @@ pub fn cast_confuse(
 pub fn player_death(player: &mut Object, messages: &mut Messages) {
     // the game ended!
     // TODO Replace with game.log.add()
-    message(messages, "You died!", colors::DARK_RED);
+    message(messages, DEATH_MSG, colors::DARK_RED);
 
     // for added effect, transform the player into a corpse!
     player.char = CORPSE;

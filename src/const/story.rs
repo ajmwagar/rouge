@@ -9,8 +9,10 @@ pub const INTRO_MSG: &str = "Welcome stranger! Prepare to perish in the Rouge Ca
 pub const REST_MSG: &str = "You take a moment to rest, and recover your strength.";
 
 /// Message shown when finishing a level of the dungeon
-pub const DUNGEON_LVL_MSG: &str =
-    "After a rare moment of peace, you descend deeper into the heart of the dungeon...";
+pub const DUNGEON_LVL_MSG: &str = "After a rare moment of peace, you descend deeper into the heart of the dungeon...";
+
+/// Message shown after player death
+pub const DEATH_MSG: &str = "You died!";
 
 /*
  * Menu Strings

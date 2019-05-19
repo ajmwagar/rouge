@@ -162,7 +162,13 @@ impl Object {
         // apply damage if possible
         if let Some(fighter) = self.fighter.as_mut() {
             if damage > 0 {
+                // Take damage
                 fighter.hp -= damage;
+
+                // Make sure hp doesn't go past 0
+                if fighter.hp < 0 {
+                    fighter.hp = 0;
+                }
             }
         }
         // check for death, call the death function
