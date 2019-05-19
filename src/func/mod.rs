@@ -363,7 +363,7 @@ pub fn play_game(objects: &mut Vec<Object>, game: &mut Game, tcod: &mut Tcod) {
         previous_player_position = objects[PLAYER].pos();
         let player_action = handle_keys(key, tcod, objects, game);
         if player_action == PlayerAction::Exit {
-            save_game(objects, game);
+            save_game(objects, game).expect("Failed to save game");
             break;
         }
 
@@ -584,8 +584,8 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
         "XP",
         xp,
         level_up_xp,
-        colors::YELLOW,
-        colors::DARKER_YELLOW,
+        colors::GREEN,
+        colors::DARKER_GREEN,
     );
 
     tcod.panel.print_ex(
@@ -595,6 +595,14 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
         TextAlignment::Left,
         format!("{}{}", DUNGEON_LVL_PREFIX, game.dungeon_level),
     );
+    tcod.panel.print_ex(
+        1,
+        4,
+        BackgroundFlag::None,
+        TextAlignment::Left,
+        format!("POW: {} DEF: {}", objects[PLAYER].power(&game), objects[PLAYER].defense(&game)),
+    );
+
 
     // display names of objects under the mouse
     tcod.panel.set_default_foreground(colors::LIGHT_GREY);

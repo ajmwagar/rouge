@@ -13,7 +13,51 @@ use rouge::types::*;
  * Finally we're at main. This includes our map/player generation and gameloop.
  */
 
+#[macro_use]
+extern crate structopt;
+
+use std::path::PathBuf;
+use structopt::StructOpt;
+
+/// A small procedural roguelike 
+#[derive(StructOpt, Debug)]
+#[structopt(name = "rouge")]
+struct Opt {
+    // A flag, true if used in the command line. Note doc comment will
+    // be used for the help message of the flag.
+    /// Activate fullscreen mode
+    #[structopt(short = "fs", long = "fullscreen")]
+    fullscreen: bool,
+
+    // The number of occurrences of the `v/verbose` flag
+    /// Verbose mode (-v, -vv, -vvv, etc.)
+    #[structopt(short = "v", long = "verbose", parse(from_occurrences))]
+    verbose: u8,
+
+    /// Set max fps
+    #[structopt(short = "f", long = "fps", default_value = "60")]
+    fps: i32,
+
+    // /// Output file
+    // #[structopt(short = "o", long = "output", parse(from_os_str))]
+    // output: PathBuf,
+
+    // /// Number of cars
+    // #[structopt(short = "c", long = "nb-cars")]
+    // nb_cars: Option<i32>,
+
+    // /// admin_level to consider
+    // #[structopt(short = "l", long = "level")]
+    // level: Vec<String>,
+}
+
 fn main() {
+    let opt = Opt::from_args();
+    // println!("{:?}", opt);
+
+    // Limit FPS here
+    tcod::system::set_fps(opt.fps);
+
     // Init the root window here. All other settings fallback to default
     let root = Root::initializer()
         .font(
@@ -24,11 +68,10 @@ fn main() {
         .font_type(FontType::Default)
         .font_dimensions(16, 16)
         .size(SCREEN_WIDTH, SCREEN_HEIGHT)
-        .title("Rouge")
+        .title(GAME_TITLE)
+        .fullscreen(opt.fullscreen)
         .init();
 
-    // Limit FPS here
-    tcod::system::set_fps(LIMIT_FPS);
 
     // Create the Tcod instance
     let mut tcod = Tcod {

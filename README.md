@@ -1,27 +1,34 @@
-# rouge
+# rouge (red in french) (working title)
 
-A small procedural rougelike written in Rust.
+A small procedural rouge-like written in Rust.
 
 ## Screenshots 
 
-__TODO:__ add screenshots... I swear it doesn't look bad.
+![main_menu](./img/screenshot/main_menu.png)
+![new_game](./img/screenshot/new_game.png)
+![healing](./img/screenshot/healing.png)
 
 ## Installation
 
-1. `git clone https://github.com/ajmwagar/rouge`
-2. `cd rouge`
-3. Either
-- `cargo run --release`
-__OR__
-- `cargo install --path ./`
-- `rouge`
+```bash
+git clone https://github.com/ajmwagar/rouge
+cd rouge
+cargo run --release
+```
+
+**OR**
+
+```bash
+cargo install --path ./
+rouge
+```
 
 ## Rules of the rouge
 
-- One life or you restart.
-- You gain some heal each level you progress.
-- You can only hold 26 items at a time.
-- Infinite levels. Dificulty progresses ove time
+- Permadeath (single life)
+- Gear up with swords, potions, and spells!
+- Fight deeper into the dungeon to unlock it's secrets
+- Infinite **procedural** levels. Difficulty progresses over time. (So does the story)
 
 ## Controls
 
@@ -29,7 +36,7 @@ Rouge's controls are pretty simple.
 
 The defaults are as follows:
 
-- `<`: Decend staircase
+- `<`: Descend staircase
 - `i`: open inventory
 - `c`: open character menu
 - `Arrow Keys`: Movement
