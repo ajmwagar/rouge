@@ -17,6 +17,7 @@ use tcod::input::KeyCode::*;
 use tcod::input::{self, Event};
 
 use crate::r#const::*;
+use crate::r#const::story::*;
 use crate::types::*;
 
 pub mod combat;
@@ -135,6 +136,12 @@ pub fn handle_keys(
             }
             DidntTakeTurn
         }
+        (Key { printable: '?', .. }, true) => {
+            let msg = format!("Controls:\ng: pick up an item\nd: drop an item\ni: open the inventory\nc: open the character menu\n<: go down the stairs\nArrow Keys: movement\nesc: open the menu");
+            msgbox(&msg, CHARACTER_SCREEN_WIDTH, &mut tcod.root);
+
+            DidntTakeTurn
+        },
         (Key { printable: 'c', .. }, true) => {
             // show character information
             let player = &objects[PLAYER];
@@ -301,7 +308,7 @@ pub fn new_game(tcod: &mut Tcod) -> (Vec<Object>, Game) {
 
     // a warm welcoming message!
     game.log.add(
-        "Welcome stranger! Prepare to perish in the Rouge Cachot.",
+        INTRO_MSG,
         colors::RED,
     );
 
@@ -438,8 +445,8 @@ pub fn main_menu(tcod: &mut Tcod) {
 pub fn save_game(objects: &[Object], game: &Game) -> Result<(), Box<Error>> {
     let save_data = serde_json::to_string(&(objects, game))?;
     // TODO use the dirs crate
-    create_dir_all("$USER/.cache/rouge/")?;
-    let mut file = File::create("$USER/.cache/rouge/savegame")?;
+    create_dir_all("~/.cache/rouge/")?;
+    let mut file = File::create("~/.cache/rouge/savegame")?;
     file.write_all(save_data.as_bytes())?;
     Ok(())
 }
@@ -447,7 +454,7 @@ pub fn save_game(objects: &[Object], game: &Game) -> Result<(), Box<Error>> {
 /// Load gamestate from the filesystem
 pub fn load_game() -> Result<(Vec<Object>, Game), Box<Error>> {
     let mut json_save_state = String::new();
-    let mut file = File::open("$USER/.cache/rouge/savegame")?;
+    let mut file = File::open("~/.cache/rouge/savegame")?;
     file.read_to_string(&mut json_save_state)?;
     let result = serde_json::from_str::<(Vec<Object>, Game)>(&json_save_state)?;
     Ok(result)
@@ -601,7 +608,7 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
     tcod.panel.set_default_foreground(colors::LIGHT_GREY);
     tcod.panel.print_ex(
         1,
-        0,
+        2,
         BackgroundFlag::None,
         TextAlignment::Left,
         get_names_under_mouse(tcod.mouse, objects, &tcod.fov),

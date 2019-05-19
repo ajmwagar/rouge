@@ -3,7 +3,7 @@
  */
 
 /// Message shown at the beginning of a game
-pub const INTRO_MSG: &str = "";
+pub const INTRO_MSG: &str = "Welcome stranger! Prepare to perish in the Rouge Cachot.";
 
 /// Message for when a player rests
 pub const REST_MSG: &str = "You take a moment to rest, and recover your strength.";
