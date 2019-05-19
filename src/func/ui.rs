@@ -1,24 +1,16 @@
-use super::*;
-use crate::r#const::*;
-use crate::types::object::Object;
-use crate::types::rect::Rect;
-use crate::types::slot::Slot;
-use crate::types::tile::Tile;
-use crate::types::Map;
-use tcod::colors::{self, Color};
-
-use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
-use rand::Rng;
-
 use std::cmp;
 
-use tcod::console::*;
-use tcod::map::{FovAlgorithm, Map as FovMap};
+use super::*;
+use crate::types::object::Object;
+use crate::types::rect::Rect;
+use crate::types::tile::Tile;
+use crate::types::Map;
 
-use tcod::input::Key;
-use tcod::input::KeyCode::*;
-use tcod::input::{self, Event, Mouse};
+use tcod::colors::{self, Color};
+use tcod::input::Mouse;
+use tcod::map::Map as FovMap;
 
+/// Creates a menu
 pub fn menu<T: AsRef<str>>(
     header: &str,
     options: &[T],
@@ -91,6 +83,7 @@ pub fn menu<T: AsRef<str>>(
     }
 }
 
+/// Show the inventory_menu
 pub fn inventory_menu(inventory: &[Object], header: &str, root: &mut Root) -> Option<usize> {
     // how a menu with each item of the inventory as an option
     let options = if inventory.len() == 0 {
@@ -134,6 +127,7 @@ pub fn get_names_under_mouse(mouse: Mouse, objects: &[Object], fov_map: &FovMap)
     names.join(", ") // join the names, separated by commas
 }
 
+/// Create a message
 pub fn message<T: Into<String>>(messages: &mut Messages, message: T, color: Color) {
     // if the buffer is full, remove the first message to make room for the new one
     if messages.len() == MSG_HEIGHT {
@@ -143,6 +137,7 @@ pub fn message<T: Into<String>>(messages: &mut Messages, message: T, color: Colo
     messages.push((message.into(), color));
 }
 
+/// Render a bar
 pub fn render_bar(
     panel: &mut Offscreen,
     x: i32,
@@ -178,11 +173,13 @@ pub fn render_bar(
     );
 }
 
+/// Create a message box
 pub fn msgbox(text: &str, width: i32, root: &mut Root) {
     let options: &[&str] = &[];
     menu(text, options, width, root);
 }
 
+/// Create a room
 pub fn create_room(room: Rect, map: &mut Map) {
     for x in (room.x1 + 1)..room.x2 {
         for y in (room.y1 + 1)..room.y2 {
@@ -191,12 +188,14 @@ pub fn create_room(room: Rect, map: &mut Map) {
     }
 }
 
+/// Create a horizontal tunnel
 pub fn create_h_tunnel(x1: i32, x2: i32, y: i32, map: &mut Map) {
     for x in cmp::min(x1, x2)..(cmp::max(x1, x2) + 1) {
         map[x as usize][y as usize] = Tile::empty();
     }
 }
 
+/// Create a vertical tunnel
 pub fn create_v_tunnel(y1: i32, y2: i32, x: i32, map: &mut Map) {
     for y in cmp::min(y1, y2)..(cmp::max(y1, y2) + 1) {
         map[x as usize][y as usize] = Tile::empty();

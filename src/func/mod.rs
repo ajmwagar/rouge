@@ -1,20 +1,20 @@
 //! Utility Functions in the Rouge game
 use std::error::Error;
-use std::fs::{File, create_dir_all};
+use std::fs::{create_dir_all, File};
 use std::io::{Read, Write};
 
-use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
+use rand::distributions::{Weighted, WeightedChoice};
 use rand::Rng;
 
 use std::cmp;
 
-use tcod::colors::{self, Color};
+use tcod::colors;
 use tcod::console::*;
-use tcod::map::{FovAlgorithm, Map as FovMap};
+use tcod::map:: Map as FovMap;
 
 use tcod::input::Key;
 use tcod::input::KeyCode::*;
-use tcod::input::{self, Event, Mouse};
+use tcod::input::{self, Event};
 
 use crate::r#const::*;
 use crate::types::*;
@@ -461,7 +461,7 @@ pub fn move_by(id: usize, dx: i32, dy: i32, map: &Map, objects: &mut [Object]) {
     }
 }
 
-/// Check if a space on the map is blocked 
+/// Check if a space on the map is blocked
 pub fn is_blocked(x: i32, y: i32, map: &Map, objects: &[Object]) -> bool {
     // first test the map tile
     if map[x as usize][y as usize].blocked {
@@ -559,16 +559,34 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
     // show the player's stats
     let hp = objects[PLAYER].fighter.map_or(0, |f| f.hp);
     let max_hp = objects[PLAYER].max_hp(game);
+    // Render the hp bar
     render_bar(
         &mut tcod.panel,
         1,
-        1,
+        0,
         BAR_WIDTH,
         "HP",
         hp,
         max_hp,
         colors::LIGHT_RED,
         colors::DARKER_RED,
+    );
+
+    // show the player's stats
+    let xp = objects[PLAYER].fighter.map_or(0, |f| f.xp);
+
+    let level_up_xp = LEVEL_UP_BASE + objects[PLAYER].level * LEVEL_UP_FACTOR;
+    // Render the xp bar
+    render_bar(
+        &mut tcod.panel,
+        1,
+        1,
+        BAR_WIDTH,
+        "XP",
+        xp,
+        level_up_xp,
+        colors::YELLOW,
+        colors::DARKER_YELLOW,
     );
 
     tcod.panel.print_ex(

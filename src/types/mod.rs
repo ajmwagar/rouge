@@ -1,21 +1,11 @@
 //! Types in the Rouge games
 use super::*;
-use std::error::Error;
-use std::fs::File;
-use std::io::{Read, Write};
-
-use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
-use rand::Rng;
-
-use std::cmp;
 
 use tcod::colors::{self, Color};
 use tcod::console::*;
-use tcod::map::{FovAlgorithm, Map as FovMap};
+use tcod::map::Map as FovMap;
 
-use tcod::input::Key;
-use tcod::input::KeyCode::*;
-use tcod::input::{self, Event, Mouse};
+use tcod::input::Mouse;
 
 // Import types
 pub mod deathcallback;
@@ -26,7 +16,7 @@ pub mod slot;
 pub mod tile;
 
 // Export Types
-pub use self::eathcallback::DeathCallback;
+pub use self::deathcallback::DeathCallback;
 pub use self::item::Item;
 pub use self::object::Object;
 pub use self::rect::Rect;

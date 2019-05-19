@@ -1,38 +1,12 @@
-#![feature(uniform_paths)]
-
 /*
  * CRATES/USE calls
  */
 
-extern crate rand;
-extern crate serde;
-extern crate tcod;
-#[macro_use]
-extern crate serde_derive;
-extern crate serde_json;
-// the existing imports
-use std::error::Error;
-use std::fs::File;
-use std::io::{Read, Write};
-
-use rand::distributions::{IndependentSample, Weighted, WeightedChoice};
-use rand::Rng;
-
-use std::cmp;
-
-use tcod::colors::{self, Color};
 use tcod::console::*;
-use tcod::map::{FovAlgorithm, Map as FovMap};
+use tcod::map::Map as FovMap;
 
-use tcod::input::KeyCode::*;
-
-use rouge::func::combat::ai_take_turn;
 use rouge::func::*;
 use rouge::r#const::*;
-use rouge::types::deathcallback::DeathCallback;
-use rouge::types::item::Item;
-use rouge::types::object::Object;
-use rouge::types::slot::Slot;
 use rouge::types::*;
 
 /*
@@ -43,7 +17,8 @@ fn main() {
     // Init the root window here. All other settings fallback to default
     let root = Root::initializer()
         .font(
-            "./fonts/DarkondDigsDeeper_16x16.png",
+            // "./fonts/DarkondDigsDeeper_16x16.png",
+            "./fonts/Cheepicus_8x8x2.png",
             FontLayout::AsciiInRow,
         )
         .font_type(FontType::Default)
@@ -55,6 +30,7 @@ fn main() {
     // Limit FPS here
     tcod::system::set_fps(LIMIT_FPS);
 
+    // Create the Tcod instance
     let mut tcod = Tcod {
         root: root,
         con: Offscreen::new(MAP_WIDTH, MAP_HEIGHT),
@@ -64,6 +40,4 @@ fn main() {
     };
 
     main_menu(&mut tcod);
-    // let (mut objects, mut game) = new_game(&mut tcod);
-    // play_game(&mut objects, &mut game, &mut tcod);
 }

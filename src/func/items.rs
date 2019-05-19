@@ -1,17 +1,12 @@
 //! Items in the Rouge game
-
+use rand::distributions::IndependentSample;
 use super::*;
 use crate::func::combat::*;
 use crate::func::ui::message;
-use crate::r#const::*;
+use crate::r#const::prob::{enemies::*, items::*};
 use crate::types::object::Object;
-use crate::types::Game;
-use crate::types::MessageLog;
-use crate::types::Messages;
-use crate::types::Tcod;
-use crate::types::UseResult;
-use crate::types::*;
-use tcod::colors::{self, Color};
+use crate::types::{Game, MessageLog, Messages, Tcod, UseResult};
+use tcod::colors;
 
 /// Return the object in a given slot
 pub fn get_equipped_in_slot(slot: Slot, inventory: &[Object]) -> Option<usize> {
@@ -50,7 +45,6 @@ pub fn toggle_equipment(
     UseResult::UsedAndKept
 }
 
-
 /// Drop an Item from the inventory
 pub fn drop_item(
     inventory_id: usize,
@@ -71,7 +65,6 @@ pub fn drop_item(
     );
     objects.push(item);
 }
-
 
 /// Use an item
 pub fn use_item(inventory_id: usize, objects: &mut [Object], game: &mut Game, tcod: &mut Tcod) {
@@ -156,14 +149,7 @@ pub fn pick_item_up(
 /// Place objects in the map
 pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32) {
     // choose random number of monsters
-    let max_monsters = from_dungeon_level(
-        &[
-            Transition { level: 1, value: 2 },
-            Transition { level: 4, value: 3 },
-            Transition { level: 6, value: 5 },
-        ],
-        level,
-    );
+    let max_monsters = from_dungeon_level(MAX_MONSTERS, level);
 
     // choose random number of monsters
     let num_monsters = rand::thread_rng().gen_range(0, max_monsters + 1);
@@ -176,31 +162,11 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
         // only place it if the tile is not blocked
         if !is_blocked(x, y, map, objects) {
             // monster random table
-            let troll_chance = from_dungeon_level(
-                &[
-                    Transition {
-                        level: 3,
-                        value: 15,
-                    },
-                    Transition {
-                        level: 5,
-                        value: 30,
-                    },
-                    Transition {
-                        level: 7,
-                        value: 60,
-                    },
-                    Transition {
-                        level: 10,
-                        value: 80,
-                    },
-                ],
-                level,
-            );
+            let troll_chance = from_dungeon_level(TROLL_CHANCES, level);
 
             let monster_chances = &mut [
                 Weighted {
-                    weight: 80,
+                    weight: ORC_WEIGHT,
                     item: "orc",
                 },
                 Weighted {
@@ -216,60 +182,12 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     // create an orc
                     let mut orc = Object::new(x, y, ORC, "orc", colors::DESATURATED_GREEN, true);
                     orc.fighter = Some(Fighter {
-                        base_max_hp: from_dungeon_level(
-                            &[
-                                Transition {
-                                    level: 1,
-                                    value: 20,
-                                },
-                                Transition {
-                                    level: 2,
-                                    value: 25,
-                                },
-                                Transition {
-                                    level: 5,
-                                    value: 45,
-                                },
-                                Transition {
-                                    level: 10,
-                                    value: 50,
-                                },
-                                Transition {
-                                    level: 20,
-                                    value: 100,
-                                },
-                            ],
-                            level,
-                        ) as i32,
-                        hp: from_dungeon_level(
-                            &[
-                                Transition {
-                                    level: 1,
-                                    value: 20,
-                                },
-                                Transition {
-                                    level: 2,
-                                    value: 25,
-                                },
-                                Transition {
-                                    level: 5,
-                                    value: 45,
-                                },
-                                Transition {
-                                    level: 10,
-                                    value: 50,
-                                },
-                                Transition {
-                                    level: 20,
-                                    value: 100,
-                                },
-                            ],
-                            level,
-                        ) as i32,
-                        base_defense: (level / 2) as i32,
-                        base_power: 4 + (level) as i32,
+                        base_max_hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
+                        hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
+                        base_defense: (level / ORC_DEFENSE_OFFSET) as i32,
+                        base_power: ORC_BASE_POW + (level) as i32,
                         on_death: DeathCallback::Monster,
-                        xp: 5 * level as i32,
+                        xp: ORC_BASE_XP * level as i32,
                     });
                     orc.ai = Some(Ai::Basic);
                     orc
@@ -278,60 +196,12 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     // create a troll
                     let mut troll = Object::new(x, y, TROLL, "troll", colors::DARKER_GREEN, true);
                     troll.fighter = Some(Fighter {
-                        base_max_hp: from_dungeon_level(
-                            &[
-                                Transition {
-                                    level: 1,
-                                    value: 40,
-                                },
-                                Transition {
-                                    level: 2,
-                                    value: 55,
-                                },
-                                Transition {
-                                    level: 5,
-                                    value: 65,
-                                },
-                                Transition {
-                                    level: 10,
-                                    value: 75,
-                                },
-                                Transition {
-                                    level: 20,
-                                    value: 150,
-                                },
-                            ],
-                            level,
-                        ) as i32,
-                        hp: from_dungeon_level(
-                            &[
-                                Transition {
-                                    level: 1,
-                                    value: 40,
-                                },
-                                Transition {
-                                    level: 2,
-                                    value: 55,
-                                },
-                                Transition {
-                                    level: 5,
-                                    value: 65,
-                                },
-                                Transition {
-                                    level: 10,
-                                    value: 75,
-                                },
-                                Transition {
-                                    level: 20,
-                                    value: 150,
-                                },
-                            ],
-                            level,
-                        ) as i32,
-                        base_defense: level as i32 + 2,
-                        base_power: level as i32 + 8,
+                        base_max_hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
+                        hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
+                        base_defense: level as i32 + TROLL_BASE_DEF,
+                        base_power: level as i32 + TROLL_BASE_POW,
                         on_death: DeathCallback::Monster,
-                        xp: 35 * level as i32,
+                        xp: TROLL_BASE_XP * level as i32,
                     });
                     troll.ai = Some(Ai::Basic);
                     troll
@@ -345,13 +215,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
     }
 
     // maximum number of items per room
-    let max_items = from_dungeon_level(
-        &[
-            Transition { level: 1, value: 1 },
-            Transition { level: 4, value: 2 },
-        ],
-        level,
-    );
+    let max_items = from_dungeon_level(MAX_ITEMS, level);
 
     // choose random number of items
     let num_items = rand::thread_rng().gen_range(0, max_items + 1);
@@ -367,27 +231,15 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
             let item_chances = &mut [
                 // healing potion always shows up, even if all other items have 0 chance
                 Weighted {
-                    weight: 35,
+                    weight: HEAL_WEIGHT,
                     item: Item::Heal,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 4,
-                            value: 25,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(LIGHTNING_WEIGHTS, level),
                     item: Item::Lightning,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 6,
-                            value: 25,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(FIREBALL_WEIGHTS, level),
                     item: Item::Fireball,
                 },
                 Weighted {
@@ -573,8 +425,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 Item::IronShield => {
                     // create a shield
-                    let mut object =
-                        Object::new(x, y, '[', "iron shield", colors::SILVER, false);
+                    let mut object = Object::new(x, y, '[', "iron shield", colors::SILVER, false);
                     object.item = Some(Item::IronShield);
                     object.equipment = Some(Equipment {
                         equipped: false,

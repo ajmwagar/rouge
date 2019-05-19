@@ -3,8 +3,8 @@ use super::*;
 use tcod::map::FovAlgorithm;
 use tcod::Color;
 
-pub mod story;
 pub mod prob;
+pub mod story;
 
 /// Location of the save game from the user's home directory
 pub const SAVE_GAME_LOCATION: &str = "/.cache/rouge/savegame";

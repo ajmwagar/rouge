@@ -1,2 +1,2 @@
-mod enemies;
-mod items;
+pub mod enemies;
+pub mod items;

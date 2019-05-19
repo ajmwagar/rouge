@@ -55,7 +55,6 @@ impl Object {
         base_defense + bonus
     }
 
-
     /// Returns the current power of an object
     pub fn power(&self, game: &Game) -> i32 {
         let base_power = self.fighter.map_or(0, |f| f.base_power);
@@ -104,7 +103,7 @@ impl Object {
                 equipment.equipped = true;
                 log.add(
                     format!("Equipped {} on {}.", self.name, equipment.slot),
-                    colors::LIGHT_GREEN,
+                    colors::GREEN,
                 );
             }
         } else {
@@ -193,7 +192,6 @@ impl Object {
         self.x = x;
         self.y = y;
     }
-
 
     /// Object constructor
     pub fn new(x: i32, y: i32, char: char, name: &str, color: Color, blocks: bool) -> Self {

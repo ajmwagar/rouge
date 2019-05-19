@@ -1,4 +1,5 @@
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+/// List of items
 pub enum Item {
     // Spells/Potions
     Heal,

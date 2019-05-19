@@ -1,7 +1,7 @@
 use super::*;
+use crate::r#const::story::*;
 use crate::r#const::*;
-use crate::types::*;
-use tcod::colors::{self, Color};
+use tcod::colors;
 
 /// Returns a value that depends on level. the table specifies what
 /// value occurs after each level, default is 0.
@@ -13,6 +13,7 @@ pub fn from_dungeon_level(table: &[Transition], level: u32) -> u32 {
         .map_or(0, |transition| transition.value)
 }
 
+/// Increase the player level and show a menu to increase stats
 pub fn level_up(objects: &mut [Object], game: &mut Game, tcod: &mut Tcod) {
     let player = &mut objects[PLAYER];
     let level_up_xp = LEVEL_UP_BASE + player.level * LEVEL_UP_FACTOR;
@@ -21,10 +22,7 @@ pub fn level_up(objects: &mut [Object], game: &mut Game, tcod: &mut Tcod) {
         // it is! level up
         player.level += 1;
         game.log.add(
-            format!(
-                "Your battle skills grow stronger! You reached level {}!",
-                player.level
-            ),
+            format!("{} {}!", LEVEL_UP_MSG, player.level),
             colors::YELLOW,
         );
         let fighter = player.fighter.as_mut().unwrap();
@@ -32,7 +30,7 @@ pub fn level_up(objects: &mut [Object], game: &mut Game, tcod: &mut Tcod) {
         while choice.is_none() {
             // keep asking until a choice is made
             choice = menu(
-                "Level up! Choose a stat to raise:\n",
+                LEVEL_UP_MENU_HEADER,
                 &[
                     format!("Constitution (+20 HP, from {})", fighter.base_max_hp),
                     format!("Strength (+1 attack, from {})", fighter.base_power),
@@ -61,18 +59,13 @@ pub fn level_up(objects: &mut [Object], game: &mut Game, tcod: &mut Tcod) {
 
 /// Advance to the next level
 pub fn next_level(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) {
-    game.log.add(
-        "You take a moment to rest, and recover your strength.",
-        colors::VIOLET,
-    );
+    game.log.add(REST_MSG, colors::VIOLET);
+
+    // Heal 50% of the player's health
     let heal_hp = objects[PLAYER].max_hp(game) / 2;
     objects[PLAYER].heal(heal_hp, game);
 
-    game.log.add(
-        "After a rare moment of peace, you descend deeper into \
-         the heart of the dungeon...",
-        colors::RED,
-    );
+    game.log.add(DUNGEON_LVL_MSG, colors::RED);
     game.dungeon_level += 1;
 
     objects[PLAYER].fighter.as_mut().unwrap().xp += (game.dungeon_level * 10) as i32;

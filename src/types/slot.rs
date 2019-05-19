@@ -1,6 +1,7 @@
 use super::*;
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+/// Slot for equipment
 pub enum Slot {
     LeftHand,
     RightHand,
