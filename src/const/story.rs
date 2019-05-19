@@ -21,3 +21,8 @@ pub const LEVEL_UP_MSG: &str = "Your battle skills grow stronger! You reached le
 
 /// Header shown at the top of level up menu
 pub const LEVEL_UP_MENU_HEADER: &str = "Level up! Choose a stat to raise:\n";
+
+/// Prefix before dungeon level
+pub const DUNGEON_LVL_PREFIX: &str = "Dungeon Level: ";
+
+pub const INVENTORY_MSG: &str = "Press the key next to an item to drop it, or any other to cancel.\n'";

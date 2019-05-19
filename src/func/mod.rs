@@ -118,7 +118,7 @@ pub fn handle_keys(
             // show the inventory; if an item is selected, drop it
             let inventory_index = inventory_menu(
                 &mut game.inventory,
-                "Press the key next to an item to drop it, or any other to cancel.\n'",
+                INVENTORY_MSG,
                 &mut tcod.root,
             );
             if let Some(inventory_index) = inventory_index {
@@ -380,7 +380,7 @@ pub fn play_game(objects: &mut Vec<Object>, game: &mut Game, tcod: &mut Tcod) {
 
 /// Create and render the main menu
 pub fn main_menu(tcod: &mut Tcod) {
-    let img = tcod::image::Image::from_file("./img/menu_background.png")
+    let img = tcod::image::Image::from_file(MENU_BACKGROUND_PATH)
         .ok()
         .expect("Background image not found");
 
@@ -394,25 +394,17 @@ pub fn main_menu(tcod: &mut Tcod) {
             SCREEN_HEIGHT / 2 - 4,
             BackgroundFlag::None,
             TextAlignment::Center,
-            "ROUGE",
+            GAME_TITLE,
         );
         tcod.root.print_ex(
             SCREEN_WIDTH / 2,
             SCREEN_HEIGHT - 2,
             BackgroundFlag::None,
             TextAlignment::Center,
-            "By Avery Wagar (@ajmwagar)",
+            AUTHOR,
         );
 
-        // show options and wait for the player's choice
-        let mut choices = vec![];
-
-        choices.push("Continue Game");
-
-        choices.append(&mut ["New Game", "Quit"].to_vec());
-        // "Continue", "New game", "Quit"
-
-        let choice = menu("", &choices, 24, &mut tcod.root);
+        let choice = menu("", &MAIN_MENU_CHOICES, MAIN_MENU_WIDTH, &mut tcod.root);
         match choice {
             Some(0) => {
                 // load game
@@ -422,7 +414,7 @@ pub fn main_menu(tcod: &mut Tcod) {
                         play_game(&mut objects, &mut game, tcod);
                     }
                     Err(_e) => {
-                        msgbox("\nNo saved game to load.\n", 24, &mut tcod.root);
+                        msgbox("\nNo saved game to load.\n", MAIN_MENU_WIDTH, &mut tcod.root);
                         continue;
                     }
                 }
@@ -601,7 +593,7 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
         3,
         BackgroundFlag::None,
         TextAlignment::Left,
-        format!("Dungeon level: {}", game.dungeon_level),
+        format!("{}{}", DUNGEON_LVL_PREFIX, game.dungeon_level),
     );
 
     // display names of objects under the mouse

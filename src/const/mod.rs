@@ -6,28 +6,46 @@ use tcod::Color;
 pub mod prob;
 pub mod story;
 
+/// Title of the game
+pub const GAME_TITLE: &str = "Rouge";
+
+/// Credits shown on main menu
+pub const AUTHOR: &str = "By Avery Wagar (@ajmwagar)";
+
+/// Choices on the main menu
+pub const MAIN_MENU_CHOICES: &[&str] = &["Continue", "New Game", "Quit"];
+
 /// Location of the save game from the user's home directory
 pub const SAVE_GAME_LOCATION: &str = "/.cache/rouge/savegame";
 /// Save game path
 pub const SAVE_GAME_PATH: &str = "/.cache/rouge/";
 
+/// Location of the menu background
+pub const MENU_BACKGROUND_PATH: &str = "./img/forest_background.png";
+
+
+/*
+ * Graphics
+ */
+
 /// Corpse character
 pub const CORPSE: char = 1u8 as char;
+
 /// Troll character
-pub const TROLL: char = 161u8 as char;
+pub const TROLL: char = 2u8 as char;
+
 /// Orc character
-pub const ORC: char = 160u8 as char;
+pub const ORC: char = 1u8 as char;
+
 /// Wall character
-pub const WALL: char = 164u8 as char;
+pub const WALL: char = 255u8 as char;
+
 /// Floor character
 pub const FLOOR: char = 178u8 as char;
 
-/// Width of inventory menu
-pub const INVENTORY_WIDTH: i32 = 50;
-/// Width of level screen
-pub const LEVEL_SCREEN_WIDTH: i32 = 40;
-/// Character screen width
-pub const CHARACTER_SCREEN_WIDTH: i32 = 40;
+/* 
+ * Stats
+ */
 
 // player will always be the first object
 /// Player id
@@ -38,6 +56,24 @@ pub const PLAYER: usize = 0;
 pub const LEVEL_UP_BASE: i32 = 200;
 /// Level up factor `base + factor(n)`
 pub const LEVEL_UP_FACTOR: i32 = 150;
+
+/// xp += dungeon_level * multiplyer 
+pub const LEVEL_XP_MULTIPLIER: u32 = 10;
+
+/*
+ * UI
+ */
+
+/// Width of the main menu
+pub const MAIN_MENU_WIDTH: i32 = 24;
+
+/// Width of inventory menu
+pub const INVENTORY_WIDTH: i32 = 50;
+/// Width of level screen
+pub const LEVEL_SCREEN_WIDTH: i32 = 40;
+/// Character screen width
+pub const CHARACTER_SCREEN_WIDTH: i32 = 40;
+
 
 // Message Console
 /// Message X offset
@@ -62,6 +98,10 @@ pub const SCREEN_WIDTH: i32 = 80;
 pub const SCREEN_HEIGHT: i32 = 40;
 /// Max FPS
 pub const LIMIT_FPS: i32 = 60;
+
+/*
+ * Gameplay
+ */
 
 // Spell constants
 /// Amount of heal restored by healing potion
@@ -92,6 +132,10 @@ pub const MAX_ROOMS: i32 = 30;
 pub const MAP_WIDTH: i32 = SCREEN_WIDTH;
 /// Map height
 pub const MAP_HEIGHT: i32 = SCREEN_HEIGHT - 7;
+
+/*
+ * Colors
+ */
 
 /// RGB color of dark wall
 pub const COLOR_DARK_WALL: Color = Color {
