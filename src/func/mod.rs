@@ -188,7 +188,8 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
 
    let mut bsp = Bsp::new_with_size(0, 0, MAP_WIDTH, MAP_HEIGHT);
    
-   bsp.split_recursive(None, 12, 10, 10, 1.5, 1.5);
+   // TODO Tune this
+   bsp.split_recursive(None, 12, 7, 7, 1.7, 1.5);
 
    bsp.set_horizontal(true);
 
@@ -613,19 +614,6 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                             // Horizontal side
                             (false, _, false, _) => tcod.con.put_char(x, y, H_WALL, BackgroundFlag::Set),
 
-                            // Corners
-
-                            // Top left shape
-                            (true, true, false, false) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
-
-                            // Bottom left shape
-                            (false, true, true, false) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
-
-                            // Top right shape
-                            (true, false, false, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
-
-                            // Bottom right shape
-                            (false, false, true, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
 
                             // // T Shapes
                             // East_T
@@ -639,6 +627,20 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
 
                             // South_T
                             (false,true,true,true) => tcod.con.put_char(x, y, 202 as char, BackgroundFlag::Set),
+
+                            // Corners
+
+                            // Top left shape
+                            (true, true, _, _) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
+
+                            // Bottom left shape
+                            (_, true, true, _) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
+
+                            // Top right shape
+                            (true, _, _, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
+
+                            // Bottom right shape
+                            (_, _, true, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
 
                             (_,_,_,_) => tcod.con.put_char(x, y, (H_WALL as u8 + 17 - 3) as char, BackgroundFlag::Set),
 
