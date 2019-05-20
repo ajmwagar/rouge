@@ -189,11 +189,12 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
    let mut bsp = Bsp::new_with_size(0, 0, MAP_WIDTH, MAP_HEIGHT);
    
    // TODO Tune this
-   bsp.split_recursive(None, 12, 7, 7, 1.7, 1.5);
+   bsp.split_recursive(None, 8, 10, 11, 1.5, 1.5);
 
    bsp.set_horizontal(true);
 
    let mut counter = 0;
+
    bsp.traverse(TraverseOrder::InvertedLevelOrder, |node| {
         println!("Node: {:?}, Counter: {}", node, counter);
 
@@ -306,6 +307,8 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
         // }
     // }
     // create stairs at the center of the last room
+
+   // TODO: Make sure stairs are placed randomly
     let (last_room_x, last_room_y) = rooms[rooms.len() - 1].center();
     let mut stairs = Object::new(
         last_room_x,
