@@ -11,6 +11,7 @@ use std::cmp;
 use tcod::colors;
 use tcod::console::*;
 use tcod::map:: Map as FovMap;
+use tcod::bsp::*;
 
 use tcod::input::Key;
 use tcod::input::KeyCode::*;
@@ -185,15 +186,23 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
 
     let mut rooms = vec![];
 
-    for _ in 0..MAX_ROOMS {
-        // random width and height
-        let w = rand::thread_rng().gen_range(ROOM_MIN_SIZE, ROOM_MAX_SIZE + 1);
-        let h = rand::thread_rng().gen_range(ROOM_MIN_SIZE, ROOM_MAX_SIZE + 1);
-        // random position without going out of the boundaries of the map
-        let x = rand::thread_rng().gen_range(0, MAP_WIDTH - w);
-        let y = rand::thread_rng().gen_range(0, MAP_HEIGHT - h);
+   let mut bsp = Bsp::new_with_size(0, 0, MAP_WIDTH, MAP_HEIGHT);
+   
+   bsp.split_recursive(None, 8, 8, 8, 1.5, 1.5);
 
-        let new_room = Rect::new(x, y, w, h);
+   bsp.set_horizontal(true);
+
+   let mut counter = 0;
+   bsp.traverse(TraverseOrder::InvertedLevelOrder, |node| {
+        println!("Node: {:?}, Counter: {}", node, counter);
+
+
+        let w = node.w - 2;
+        let h = node.h - 2;
+        let x = node.x + node.w - w - 1;
+        let y = node.y + node.h - h - 1;
+
+        let new_room = Rect::new(x,y,w,h);
 
         // run through the other rooms and see if they intersect with this one
         let failed = rooms
@@ -237,7 +246,64 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
             // finally, append the new room to the list
             rooms.push(new_room);
         }
-    }
+
+       counter += 1;
+       true
+   });
+
+    // for _ in 0..MAX_ROOMS {
+    //     // random width and height
+    //     let w = rand::thread_rng().gen_range(ROOM_MIN_SIZE, ROOM_MAX_SIZE + 1);
+    //     let h = rand::thread_rng().gen_range(ROOM_MIN_SIZE, ROOM_MAX_SIZE + 1);
+    //     // random position without going out of the boundaries of the map
+    //     let x = rand::thread_rng().gen_range(0, MAP_WIDTH - w);
+    //     let y = rand::thread_rng().gen_range(0, MAP_HEIGHT - h);
+
+        // let new_room = Rect::new(x, y, w, h);
+
+        // // run through the other rooms and see if they intersect with this one
+        // let failed = rooms
+        //     .iter()
+        //     .any(|other_room| new_room.intersects_with(other_room));
+
+        // if !failed {
+        //     // this means there are no intersections, so this room is valid
+
+        //     // "paint" it to the map's tiles
+        //     create_room(new_room, &mut map);
+
+        //     // add some content to this room, such as monsters
+        //     place_objects(new_room, objects, &mut map, level as u32);
+
+        //     // center coordinates of the new room, will be useful later
+        //     let (new_x, new_y) = new_room.center();
+
+        //     if rooms.is_empty() {
+        //         // this is the first room, where the player starts at
+        //         objects[PLAYER].set_pos(new_x, new_y);
+        //     } else {
+        //         // all rooms after the first:
+        //         // connect it to the previous room with a tunnel
+
+        //         // center coordinates of the previous room
+        //         let (prev_x, prev_y) = rooms[rooms.len() - 1].center();
+
+        //         // toss a coin (random bool value -- either true or false)
+        //         if rand::random() {
+        //             // first move horizontally, then vertically
+        //             create_h_tunnel(prev_x, new_x, prev_y, &mut map);
+        //             create_v_tunnel(prev_y, new_y, new_x, &mut map);
+        //         } else {
+        //             // first move vertically, then horizontally
+        //             create_v_tunnel(prev_y, new_y, prev_x, &mut map);
+        //             create_h_tunnel(prev_x, new_x, new_y, &mut map);
+        //         }
+        //     }
+
+        //     // finally, append the new room to the list
+        //     rooms.push(new_room);
+        // }
+    // }
     // create stairs at the center of the last room
     let (last_room_x, last_room_y) = rooms[rooms.len() - 1].center();
     let mut stairs = Object::new(
@@ -348,8 +414,8 @@ pub fn play_game(objects: &mut Vec<Object>, game: &mut Game, tcod: &mut Tcod) {
         // render the screen
         let fov_recompute = previous_player_position != (objects[PLAYER].pos());
         render_all(tcod, &objects, game, fov_recompute);
-
         tcod.root.flush();
+
 
         // level up if needed
         level_up(objects, game, tcod);
@@ -503,8 +569,80 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                     // show explored tiles only (any visible tile is explored already)
                     // con.set_char_background(x, y, color, BackgroundFlag::Set);
                     if wall {
+                        // TODO Determine type of wall to place
+
+
+                        let mut north = false; let mut south = false; let mut east = false; let mut west = false; 
+                        // Get surrounding walls
+
+                        // North overflow protection
+                        if game.map[0].len() > (y + 1) as usize { 
+                            north = game.map[x as usize][(y + 1) as usize].block_sight;
+                        }
+
+                        // south edge condition
+                        if y - 1 > 0 {
+                            south = game.map[x as usize][(y - 1) as usize].block_sight;
+                        }
+
+                        if game.map.len() > (x + 1) as usize {
+                            east = game.map[(x + 1) as usize][y as usize].block_sight;
+                        }
+
+                        if x - 1 > 0 {
+                            west = game.map[(x - 1) as usize][y as usize].block_sight;
+                        }
+
+
                         tcod.con.set_default_foreground(color);
-                        tcod.con.put_char(x, y, WALL, BackgroundFlag::Set);
+                        // Match character to render
+                        match (north, east, south, west) {
+                            // North_T
+                            // (true,true,false,true) => tcod.con.put_char(x, y, 203 as char, BackgroundFlag::Set),
+                            // // South_T
+                            // (false,true,true,true) => tcod.con.put_char(x, y, 202 as char, BackgroundFlag::Set),
+
+                            // Sides
+
+                            // Vertical Side
+                            // (true, _, true, _) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
+                            (true, _, true, _) => tcod.con.put_char(x, y, V_WALL, BackgroundFlag::Set),
+
+                            // Horizontal side
+                            (_, true, _, true) => tcod.con.put_char(x, y, H_WALL, BackgroundFlag::Set),
+
+                            // Corners
+
+                            // Top left shape
+                            (true, true, _, _) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
+
+                            // Bottom left shape
+                            (_, true, true, _) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
+
+                            // Top right shape
+                            (true, _, _, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
+
+                            // Bottom right shape
+                            (_, _, true, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
+
+                            // // T Shapes
+                            // // East_T
+                            // (_,true,_,false) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
+
+
+
+                            // // West_T
+                            // (_,false,_,true) => tcod.con.put_char(x, y, 185 as char, BackgroundFlag::Set),
+
+
+
+
+
+                            (_,_,_,_) => tcod.con.put_char(x, y, ' ', BackgroundFlag::Set),
+
+
+
+                        }
                     } else {
                         tcod.con.set_default_foreground(color);
                         tcod.con.put_char(x, y, FLOOR, BackgroundFlag::Set);

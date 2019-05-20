@@ -26,7 +26,7 @@ struct Opt {
     // A flag, true if used in the command line. Note doc comment will
     // be used for the help message of the flag.
     /// Activate fullscreen mode
-    #[structopt(short = "fs", long = "fullscreen")]
+    #[structopt(short = "f", long = "fullscreen")]
     fullscreen: bool,
 
     // The number of occurrences of the `v/verbose` flag
@@ -35,7 +35,7 @@ struct Opt {
     verbose: u8,
 
     /// Set max fps
-    #[structopt(short = "f", long = "fps", default_value = "60")]
+    #[structopt(short = "s", long = "fps", default_value = "60")]
     fps: i32,
 
     // /// Output file

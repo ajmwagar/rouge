@@ -27,4 +27,12 @@ impl Tile {
             block_sight: true,
         }
     }
+
+    pub fn space() -> Self {
+        Tile {
+            blocked: true,
+            explored: false,
+            block_sight: false,
+        }
+    }
 }

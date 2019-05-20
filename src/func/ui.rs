@@ -181,8 +181,11 @@ pub fn msgbox(text: &str, width: i32, root: &mut Root) {
 
 /// Create a room
 pub fn create_room(room: Rect, map: &mut Map) {
-    for x in (room.x1 + 1)..room.x2 {
-        for y in (room.y1 + 1)..room.y2 {
+    println!("y1: {} y2: {}, x1: {}, x2: {}",room.y1, room.y2, room.x1, room.x2);
+
+    for x in (room.x1)..room.x2 {
+        for y in (room.y1)..room.y2 - 1 {
+            println!("{},{}", x, y);
             map[x as usize][y as usize] = Tile::empty();
         }
     }

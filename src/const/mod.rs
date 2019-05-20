@@ -37,11 +37,38 @@ pub const TROLL: char = 2u8 as char;
 /// Orc character
 pub const ORC: char = 1u8 as char;
 
-/// Wall character
-pub const WALL: char = 255u8 as char;
+
+/*
+ * Walls & Floors
+ */
+
+// /// Wall character
+// pub const WALL: char = 255u8 as char;
+
+/// Vertical Wall character
+pub const V_WALL: char = 186u8 as char;
+
+/// Horizontal Wall character
+pub const H_WALL: char = 205u8 as char; 
+//192
+
+/// Top Right Wall character
+pub const TR_WALL: char = 187u8 as char;
+
+/// Bottom Right Wall character
+pub const BR_WALL: char = 188u8 as char;
+
+/// Top Left Wall character
+pub const TL_WALL: char = 201u8 as char;
+
+/// Bottom Left Wall character
+pub const BL_WALL: char = 200u8 as char;
+
+// pub const T
 
 /// Floor character
-pub const FLOOR: char = 178u8 as char;
+// pub const FLOOR: char = 178u8 as char; // Cobble
+pub const FLOOR: char = 176u8 as char; // Gravel
 
 /* 
  * Stats
@@ -143,13 +170,23 @@ pub const COLOR_DARK_WALL: Color = Color {
     g: 64,
     b: 64,
 };
+// pub const COLOR_DARK_WALL: Color = Color {
+//     r: 64,
+//     g: 64,
+//     b: 64,
+// };
 
 /// RGB color of light wall
 pub const COLOR_LIGHT_WALL: Color = Color {
-    r: 130,
-    g: 110,
-    b: 50,
+    r: 1,
+    g: 82,
+    b: 93,
 };
+// pub const COLOR_LIGHT_WALL: Color = Color {
+//     r: 130,
+//     g: 110,
+//     b: 50,
+// };
 
 /// RGB color of dark ground
 pub const COLOR_DARK_GROUND: Color = Color {
