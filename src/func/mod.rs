@@ -188,7 +188,7 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
 
    let mut bsp = Bsp::new_with_size(0, 0, MAP_WIDTH, MAP_HEIGHT);
    
-   bsp.split_recursive(None, 8, 8, 8, 1.5, 1.5);
+   bsp.split_recursive(None, 12, 10, 10, 1.5, 1.5);
 
    bsp.set_horizontal(true);
 
@@ -577,68 +577,70 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
 
                         // North overflow protection
                         if game.map[0].len() > (y + 1) as usize { 
-                            north = game.map[x as usize][(y + 1) as usize].block_sight;
+                            let north_block = game.map[x as usize][(y + 1) as usize];
+                            north = north_block.block_sight && north_block.explored;
                         }
 
                         // south edge condition
                         if y - 1 > 0 {
-                            south = game.map[x as usize][(y - 1) as usize].block_sight;
+                            let south_block = game.map[x as usize][(y - 1) as usize];
+                            south = south_block.block_sight && south_block.explored;
                         }
 
                         if game.map.len() > (x + 1) as usize {
                             east = game.map[(x + 1) as usize][y as usize].block_sight;
+                            let east_block = game.map[(x + 1) as usize][y as usize];
+                            east = east_block.block_sight && east_block.explored;
                         }
 
                         if x - 1 > 0 {
-                            west = game.map[(x - 1) as usize][y as usize].block_sight;
+                            let west_block = game.map[(x - 1) as usize][y as usize];
+                            west = west_block.block_sight && west_block.explored;
                         }
 
 
                         tcod.con.set_default_foreground(color);
                         // Match character to render
                         match (north, east, south, west) {
-                            // North_T
-                            // (true,true,false,true) => tcod.con.put_char(x, y, 203 as char, BackgroundFlag::Set),
-                            // // South_T
-                            // (false,true,true,true) => tcod.con.put_char(x, y, 202 as char, BackgroundFlag::Set),
+
 
                             // Sides
 
                             // Vertical Side
                             // (true, _, true, _) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
-                            (true, _, true, _) => tcod.con.put_char(x, y, V_WALL, BackgroundFlag::Set),
+                            (_, false, _, false) => tcod.con.put_char(x, y, V_WALL, BackgroundFlag::Set),
 
                             // Horizontal side
-                            (_, true, _, true) => tcod.con.put_char(x, y, H_WALL, BackgroundFlag::Set),
+                            (false, _, false, _) => tcod.con.put_char(x, y, H_WALL, BackgroundFlag::Set),
 
                             // Corners
 
                             // Top left shape
-                            (true, true, _, _) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
+                            (true, true, false, false) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
 
                             // Bottom left shape
-                            (_, true, true, _) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
+                            (false, true, true, false) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
 
                             // Top right shape
-                            (true, _, _, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
+                            (true, false, false, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
 
                             // Bottom right shape
-                            (_, _, true, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
+                            (false, false, true, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
 
                             // // T Shapes
-                            // // East_T
-                            // (_,true,_,false) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
+                            // East_T
+                            (true,true,true,false) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
 
+                            // West_T
+                            (true,false,true,true) => tcod.con.put_char(x, y, 185 as char, BackgroundFlag::Set),
 
+                            // North_T
+                            (true,true,false,true) => tcod.con.put_char(x, y, 203 as char, BackgroundFlag::Set),
 
-                            // // West_T
-                            // (_,false,_,true) => tcod.con.put_char(x, y, 185 as char, BackgroundFlag::Set),
+                            // South_T
+                            (false,true,true,true) => tcod.con.put_char(x, y, 202 as char, BackgroundFlag::Set),
 
-
-
-
-
-                            (_,_,_,_) => tcod.con.put_char(x, y, ' ', BackgroundFlag::Set),
+                            (_,_,_,_) => tcod.con.put_char(x, y, (H_WALL as u8 + 17 - 3) as char, BackgroundFlag::Set),
 
 
 
