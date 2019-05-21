@@ -5,6 +5,8 @@ use std::io::{Read, Write};
 
 use rand::distributions::{Weighted, WeightedChoice};
 use rand::Rng;
+use rand::thread_rng;
+// use rand::seq::SliceRandom;
 
 use std::cmp;
 
@@ -30,6 +32,19 @@ pub use combat::*;
 pub use items::*;
 pub use levels::*;
 pub use ui::*;
+
+
+use tcod::namegen::Namegen;
+use tcod::random::{Rng as Trng, Algo};
+
+/// Create a namegenerator
+pub fn setup_namegen() -> Namegen {
+    let rng = Trng::new(Algo::CMWC);
+    let mut namegen = Namegen::new().unwrap();
+    namegen.parse_with_rng("./assets/namegen/mingos_standard.cfg", &rng);
+    // namegen.parse("./assets/namegen/mingos_standard.cfg");
+    namegen
+}
 
 /// Handle keydown events
 pub fn handle_keys(
@@ -176,6 +191,7 @@ Defense: {}",
 }
 
 pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
+    let namegen = setup_namegen();
     // fill map with "blocked" tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
@@ -218,7 +234,7 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
             create_room(new_room, &mut map);
 
             // add some content to this room, such as monsters
-            place_objects(new_room, objects, &mut map, level as u32);
+            place_objects(new_room, objects, &mut map, level as u32, &namegen);
 
             // center coordinates of the new room, will be useful later
             let (new_x, new_y) = new_room.center();
@@ -309,7 +325,12 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
     // create stairs at the center of the last room
 
    // TODO: Make sure stairs are placed randomly
-    let (last_room_x, last_room_y) = rooms[rooms.len() - 1].center();
+    let mut rng = rand::thread_rng();
+
+
+
+    let (last_room_x, last_room_y) = rng.choose(&rooms).unwrap().center();
+
     let mut stairs = Object::new(
         last_room_x,
         last_room_y,
@@ -506,17 +527,25 @@ pub fn main_menu(tcod: &mut Tcod) {
 /// Save the gamestate
 pub fn save_game(objects: &[Object], game: &Game) -> Result<(), Box<Error>> {
     let save_data = serde_json::to_string(&(objects, game))?;
+
+    let data_dir = dirs::data_dir().unwrap();
+
+    let path = format!("{}/{}", data_dir.to_string_lossy(), GAME_TITLE);
     // TODO use the dirs crate
-    create_dir_all("~/.cache/rouge/")?;
-    let mut file = File::create("~/.cache/rouge/savegame")?;
+    create_dir_all(path.clone())?;
+    let mut file = File::create(format!("{}/savegame", path))?;
     file.write_all(save_data.as_bytes())?;
     Ok(())
 }
 
 /// Load gamestate from the filesystem
 pub fn load_game() -> Result<(Vec<Object>, Game), Box<Error>> {
+    let data_dir = dirs::data_dir().unwrap();
+
+    let path = format!("{}/{}", data_dir.to_string_lossy(), GAME_TITLE);
+
     let mut json_save_state = String::new();
-    let mut file = File::open("~/.cache/rouge/savegame")?;
+    let mut file = File::open(format!("{}/savegame", path))?;
     file.read_to_string(&mut json_save_state)?;
     let result = serde_json::from_str::<(Vec<Object>, Game)>(&json_save_state)?;
     Ok(result)
@@ -607,6 +636,7 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                         // Match character to render
                         match (north, east, south, west) {
 
+                            (true,true,true,true) => tcod.con.put_char(x, y, (H_WALL as u8 + 17 - 3) as char, BackgroundFlag::Set),
 
                             // Sides
 
@@ -640,12 +670,10 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                             (_, true, true, _) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
 
                             // Top right shape
-                            (true, _, _, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
+                            (true, _, _, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
 
                             // Bottom right shape
-                            (_, _, true, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
-
-                            (_,_,_,_) => tcod.con.put_char(x, y, (H_WALL as u8 + 17 - 3) as char, BackgroundFlag::Set),
+                            (_, _, true, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
 
 
 

@@ -60,27 +60,40 @@ fn main() {
 
     // Init the root window here. All other settings fallback to default
     let root = Root::initializer()
-        .font(
-            // "./fonts/DarkondDigsDeeper_16x16.png",
-            "./fonts/Cheepicus_8x8x2.png",
-            FontLayout::AsciiInRow,
-        )
-        .font_type(FontType::Default)
-        .font_dimensions(16, 16)
-        .size(SCREEN_WIDTH, SCREEN_HEIGHT)
-        .title(GAME_TITLE)
-        .fullscreen(opt.fullscreen)
-        .init();
+	.font(
+	    // "./fonts/DarkondDigsDeeper_16x16.png",
+	    "./fonts/Cheepicus_8x8x2.png",
+	    FontLayout::AsciiInRow,
+	    )
+	.font_type(FontType::Default)
+	.font_dimensions(16, 16)
+	.size(SCREEN_WIDTH, SCREEN_HEIGHT)
+	.title(GAME_TITLE)
+	.fullscreen(opt.fullscreen)
+	.init();
 
 
     // Create the Tcod instance
     let mut tcod = Tcod {
-        root: root,
-        con: Offscreen::new(MAP_WIDTH, MAP_HEIGHT),
-        panel: Offscreen::new(SCREEN_WIDTH, PANEL_HEIGHT),
-        fov: FovMap::new(MAP_WIDTH, MAP_HEIGHT),
-        mouse: Default::default(),
+	root: root,
+	con: Offscreen::new(MAP_WIDTH, MAP_HEIGHT),
+	panel: Offscreen::new(SCREEN_WIDTH, PANEL_HEIGHT),
+	fov: FovMap::new(MAP_WIDTH, MAP_HEIGHT),
+	mouse: Default::default(),
     };
+
+    use std::fs::File;
+    use std::io::BufReader;
+    use rodio::Source;
+
+    let device = rodio::default_output_device().unwrap();
+
+    let sink = rodio::Sink::new(&device);
+
+    let file = File::open("./assets/soundtrack.wav").unwrap();
+    let source = rodio::Decoder::new(BufReader::new(file)).unwrap().repeat_infinite();
+
+    sink.append(source);
 
     main_menu(&mut tcod);
 }

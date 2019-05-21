@@ -1,13 +1,12 @@
 //! Items in the Rouge game
-use rand::distributions::IndependentSample;
 use super::*;
+use crate::func::setup_namegen;
 use crate::func::combat::*;
 use crate::func::ui::message;
 use crate::r#const::prob::{enemies::*, items::*};
 use crate::types::object::Object;
 use crate::types::{Game, MessageLog, Messages, Tcod, UseResult};
-use tcod::colors;
-
+use rand::distributions::IndependentSample;
 /// Return the object in a given slot
 pub fn get_equipped_in_slot(slot: Slot, inventory: &[Object]) -> Option<usize> {
     for (inventory_id, item) in inventory.iter().enumerate() {
@@ -147,14 +146,20 @@ pub fn pick_item_up(
 }
 
 /// Place objects in the map
-pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32) {
+pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32, namegen: &tcod::namegen::Namegen) {
     // choose random number of monsters
     let max_monsters = from_dungeon_level(MAX_MONSTERS, level);
+    println!("Placing objects");
 
     // choose random number of monsters
     let num_monsters = rand::thread_rng().gen_range(0, max_monsters + 1);
 
+    let name = namegen.generate("male").unwrap();
+    println!("name: {}", name);
+
     for _ in 0..num_monsters {
+        println!("Placing monster");
+
         // choose random spot for this monster
         let x = rand::thread_rng().gen_range(room.x1 + 1, room.x2);
         let y = rand::thread_rng().gen_range(room.y1 + 1, room.y2);
@@ -177,10 +182,13 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
 
             let monster_choice = WeightedChoice::new(monster_chances);
 
+
+
             let mut monster = match monster_choice.ind_sample(&mut rand::thread_rng()) {
                 "orc" => {
+
                     // create an orc
-                    let mut orc = Object::new(x, y, ORC, "orc", colors::DESATURATED_GREEN, true);
+                    let mut orc = Object::new(x, y, ORC, &format!("{} the orc", name), colors::DESATURATED_GREEN, true);
                     orc.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
                         hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
@@ -194,7 +202,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 "troll" => {
                     // create a troll
-                    let mut troll = Object::new(x, y, TROLL, "troll", colors::DARKER_GREEN, true);
+                    let mut troll = Object::new(x, y, TROLL, &format!("{} the troll", name), colors::DARKER_GREEN, true);
                     troll.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
                         hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
@@ -352,7 +360,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 Item::Heal => {
                     // create a healing potion
                     let mut object =
-                        Object::new(x, y, 20u8 as char, "healing potion", colors::VIOLET, false);
+                        Object::new(x, y, HEAL_POTION, "healing potion", colors::RED, false);
                     object.item = Some(Item::Heal);
                     object
                 }
@@ -361,7 +369,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     let mut object = Object::new(
                         x,
                         y,
-                        '-',
+                        SCROLL,
                         "scroll of lightning bolt",
                         colors::LIGHT_YELLOW,
                         false,
@@ -372,20 +380,20 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 Item::Fireball => {
                     // create a fireball scroll
                     let mut object =
-                        Object::new(x, y, '-', "scroll of fireball", colors::LIGHT_RED, false);
+                        Object::new(x, y, SCROLL, "scroll of fireball", colors::LIGHT_RED, false);
                     object.item = Some(Item::Fireball);
                     object
                 }
                 Item::Confuse => {
                     // create a confuse scroll
                     let mut object =
-                        Object::new(x, y, '-', "scroll of confusion", colors::AMBER, false);
+                        Object::new(x, y, SCROLL, "scroll of confusion", colors::AMBER, false);
                     object.item = Some(Item::Confuse);
                     object
                 }
                 Item::BronzeSword => {
                     // create a sword
-                    let mut object = Object::new(x, y, '/', "bronze sword", colors::SKY, false);
+                    let mut object = Object::new(x, y, SWORD, "bronze sword", colors::SKY, false);
                     object.item = Some(Item::BronzeSword);
                     object.equipment = Some(Equipment {
                         equipped: false,
@@ -398,12 +406,12 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 Item::IronSword => {
                     // create a sword
-                    let mut object = Object::new(x, y, '/', "iron sword", colors::SKY, false);
+                    let mut object = Object::new(x, y, SWORD, "iron sword", colors::SKY, false);
                     object.item = Some(Item::IronSword);
                     object.equipment = Some(Equipment {
                         equipped: false,
                         slot: Slot::RightHand,
-                        power_bonus: 4,
+                        power_bonus: 5,
                         defense_bonus: 0,
                         max_hp_bonus: 0,
                     });
@@ -412,21 +420,21 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 Item::WoodShield => {
                     // create a shield
                     let mut object =
-                        Object::new(x, y, '[', "wooden shield", colors::DARKER_ORANGE, false);
+                        Object::new(x, y, SHIELD, "wooden shield", colors::DARKER_ORANGE, false);
                     object.item = Some(Item::WoodShield);
                     object.equipment = Some(Equipment {
                         equipped: false,
                         slot: Slot::LeftHand,
                         max_hp_bonus: 0,
-                        defense_bonus: 1,
+                        defense_bonus: 2,
                         power_bonus: 0,
                     });
                     object
                 }
                 Item::IronShield => {
                     // create a shield
-                    let mut object = Object::new(x, y, '[', "iron shield", colors::SILVER, false);
-                    object.item = Some(Item::IronShield);
+                    let mut object =
+                        Object::new(x, y, SHIELD, "iron shield", colors::SILVER, false);                    object.item = Some(Item::IronShield);
                     object.equipment = Some(Equipment {
                         equipped: false,
                         slot: Slot::LeftHand,
@@ -438,7 +446,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 Item::Dagger => {
                     // create a sword
-                    let mut object = Object::new(x, y, '/', "iron sword", colors::SKY, false);
+                    let mut object = Object::new(x, y, SWORD, "dagger", colors::GREY, false);
                     object.item = Some(Item::IronSword);
                     object.equipment = Some(Equipment {
                         equipped: false,
@@ -475,7 +483,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     object
                 }
                 Item::ClothPants => {
-                    let mut object = Object::new(x, y, 'P', "cloth pants", colors::WHITE, false);
+                    let mut object = Object::new(x, y, PANTS, "cloth pants", colors::WHITE, false);
                     object.item = Some(Item::ClothPants);
                     object.equipment = Some(Equipment {
                         equipped: false,
@@ -487,7 +495,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     object
                 }
                 Item::ClothShirt => {
-                    let mut object = Object::new(x, y, 'S', "cloth shirt", colors::WHITE, false);
+                    let mut object = Object::new(x, y, SHIRT, "cloth shirt", colors::WHITE, false);
                     object.item = Some(Item::ClothShirt);
                     object.equipment = Some(Equipment {
                         equipped: false,
@@ -512,7 +520,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 Item::LeatherChest => {
                     let mut object =
-                        Object::new(x, y, 'S', "leather chestpiece", colors::BRASS, false);
+                        Object::new(x, y, SHIRT, "leather chestpiece", colors::BRASS, false);
                     object.item = Some(Item::LeatherChest);
                     object.equipment = Some(Equipment {
                         equipped: false,
@@ -537,8 +545,8 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     object
                 }
                 Item::LeatherKneeGaurds => {
-                    let mut object = Object::new(x, y, 'P', "leather pants", colors::BRASS, false);
-                    object.item = Some(Item::LeatherKneeGaurds);
+                    let mut object =
+                        Object::new(x, y, PANTS, "leather pants", colors::BRASS, false);                    object.item = Some(Item::LeatherKneeGaurds);
                     object.equipment = Some(Equipment {
                         equipped: false,
                         slot: Slot::Legs,

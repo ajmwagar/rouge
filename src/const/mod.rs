@@ -1,5 +1,3 @@
-use super::*;
-
 use tcod::map::FovAlgorithm;
 use tcod::Color;
 
@@ -17,8 +15,8 @@ pub const MAIN_MENU_CHOICES: &[&str] = &["Continue", "New Game", "Quit"];
 
 /// Location of the save game from the user's home directory
 pub const SAVE_GAME_LOCATION: &str = "/.cache/rouge/savegame";
-/// Save game path
-pub const SAVE_GAME_PATH: &str = "/.cache/rouge/";
+// /// Save game path
+// pub const SAVE_GAME_PATH: &str = "";
 
 /// Location of the menu background
 pub const MENU_BACKGROUND_PATH: &str = "./img/forest_background.png";
@@ -36,6 +34,23 @@ pub const TROLL: char = 2u8 as char;
 
 /// Orc character
 pub const ORC: char = 1u8 as char;
+
+/// Healing potion character
+pub const HEAL_POTION: char =  3u8 as char;
+
+/// Scroll character
+pub const SCROLL: char = '-';
+
+/// Sword character
+pub const SWORD: char = '/';
+
+/// Shield Character
+pub const SHIELD: char = '[';
+
+/// Shirt Character
+pub const SHIRT: char = 'S';
+
+pub const PANTS: char = 'P';
 
 
 /*

@@ -62,7 +62,7 @@ pub const TROLL_BASE_HP: &[Transition] = &[
 ];
 
 /// Base power level of a troll
-pub const TROLL_BASE_POW: i32 = 8;
+pub const TROLL_BASE_POW: i32 = 10;
 
 /// Base defense level of a troll
 pub const TROLL_BASE_DEF: i32 = 2;
@@ -99,7 +99,7 @@ pub const ORC_BASE_HP: &[Transition] = &[
 ];
 
 /// Base power of an orc
-pub const ORC_BASE_POW: i32 = 4;
+pub const ORC_BASE_POW: i32 = 5;
 
 /// Base amount of xp from killing an orc
 pub const ORC_BASE_XP: i32 = 5;
