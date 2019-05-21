@@ -1,6 +1,5 @@
 //! Items in the Rouge game
 use super::*;
-use crate::func::setup_namegen;
 use crate::func::combat::*;
 use crate::func::ui::message;
 use crate::r#const::prob::{enemies::*, items::*};
@@ -146,16 +145,15 @@ pub fn pick_item_up(
 }
 
 /// Place objects in the map
-pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32, namegen: &tcod::namegen::Namegen) {
+pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32) {
     // choose random number of monsters
     let max_monsters = from_dungeon_level(MAX_MONSTERS, level);
     println!("Placing objects");
 
     // choose random number of monsters
     let num_monsters = rand::thread_rng().gen_range(0, max_monsters + 1);
-
-    let name = namegen.generate("male").unwrap();
-    println!("name: {}", name);
+    // let name = namegen.generate("male").unwrap();
+    // println!("name: {}", name);
 
     for _ in 0..num_monsters {
         println!("Placing monster");
@@ -188,7 +186,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 "orc" => {
 
                     // create an orc
-                    let mut orc = Object::new(x, y, ORC, &format!("{} the orc", name), colors::DESATURATED_GREEN, true);
+                    let mut orc = Object::new(x, y, ORC, "orc", colors::DESATURATED_GREEN, true);
                     orc.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
                         hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
@@ -202,7 +200,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 "troll" => {
                     // create a troll
-                    let mut troll = Object::new(x, y, TROLL, &format!("{} the troll", name), colors::DARKER_GREEN, true);
+                    let mut troll = Object::new(x, y, TROLL, "troll", colors::DARKER_GREEN, true);
                     troll.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
                         hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,

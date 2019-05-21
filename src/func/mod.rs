@@ -234,7 +234,7 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
             create_room(new_room, &mut map);
 
             // add some content to this room, such as monsters
-            place_objects(new_room, objects, &mut map, level as u32, &namegen);
+            place_objects(new_room, objects, &mut map, level as u32);
 
             // center coordinates of the new room, will be useful later
             let (new_x, new_y) = new_room.center();
