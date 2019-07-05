@@ -188,7 +188,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
             let mut monster = match monster_choice.ind_sample(&mut rand::thread_rng()) {
                 "orc" => {
                     // create an orc
-                    let mut orc = Object::new(x, y, ORC, &name, colors::DESATURATED_GREEN, true);
+                    let mut orc = Object::new(x, y, ORC, &format!("{} (orc)", name), colors::DESATURATED_GREEN, true);
                     orc.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
                         hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
@@ -203,7 +203,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                 }
                 "troll" => {
                     // create a troll
-                    let mut troll = Object::new(x, y, TROLL, &name, colors::DARKER_GREEN, true);
+                    let mut troll = Object::new(x, y, TROLL, &format!("{} (troll)", name), colors::DARKER_GREEN, true);
                     troll.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
                         hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
