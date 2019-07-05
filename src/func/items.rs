@@ -145,7 +145,7 @@ pub fn pick_item_up(
 }
 
 /// Place objects in the map
-pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32) {
+pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u32, namegen: &mut Namegen) {
     // choose random number of monsters
     let max_monsters = from_dungeon_level(MAX_MONSTERS, level);
     println!("Placing objects");
@@ -180,13 +180,15 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
 
             let monster_choice = WeightedChoice::new(monster_chances);
 
-
+            let name = match namegen.generate("male") {
+                Some(name) => name,
+                None => String::from("monster")
+            };
 
             let mut monster = match monster_choice.ind_sample(&mut rand::thread_rng()) {
                 "orc" => {
-
                     // create an orc
-                    let mut orc = Object::new(x, y, ORC, "orc", colors::DESATURATED_GREEN, true);
+                    let mut orc = Object::new(x, y, ORC, &name, colors::DESATURATED_GREEN, true);
                     orc.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
                         hp: from_dungeon_level(ORC_BASE_HP, level) as i32,
@@ -196,11 +198,12 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                         xp: ORC_BASE_XP * level as i32,
                     });
                     orc.ai = Some(Ai::Basic);
+
                     orc
                 }
                 "troll" => {
                     // create a troll
-                    let mut troll = Object::new(x, y, TROLL, "troll", colors::DARKER_GREEN, true);
+                    let mut troll = Object::new(x, y, TROLL, &name, colors::DARKER_GREEN, true);
                     troll.fighter = Some(Fighter {
                         base_max_hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
                         hp: from_dungeon_level(TROLL_BASE_HP, level) as i32,
@@ -210,6 +213,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                         xp: TROLL_BASE_XP * level as i32,
                     });
                     troll.ai = Some(Ai::Basic);
+
                     troll
                 }
                 _ => unreachable!(),
@@ -249,13 +253,7 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     item: Item::Fireball,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 2,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(CONFUSE_WEIGHTS, level),
                     item: Item::Confuse,
                 },
                 Weighted {
@@ -263,63 +261,27 @@ pub fn place_objects(room: Rect, objects: &mut Vec<Object>, map: &Map, level: u3
                     item: Item::Dagger,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 3,
-                            value: 15,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(CLOTH_WEIGHTS, level),
                     item: Item::ClothPants,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 3,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(CLOTH_WEIGHTS, level),
                     item: Item::ClothShirt,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 4,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(LEATHER_WEIGHTS, level),
                     item: Item::LeatherHat,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 4,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(LEATHER_WEIGHTS, level),
                     item: Item::LeatherChest,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 4,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(LEATHER_WEIGHTS, level),
                     item: Item::LeatherKneeGaurds,
                 },
                 Weighted {
-                    weight: from_dungeon_level(
-                        &[Transition {
-                            level: 4,
-                            value: 10,
-                        }],
-                        level,
-                    ),
+                    weight: from_dungeon_level(LEATHER_WEIGHTS, level),
                     item: Item::LeatherWristGaurds,
                 },
                 Weighted {

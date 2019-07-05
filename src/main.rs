@@ -26,7 +26,7 @@ struct Opt {
     // A flag, true if used in the command line. Note doc comment will
     // be used for the help message of the flag.
     /// Activate fullscreen mode
-    #[structopt(short = "f", long = "fullscreen")]
+    #[structopt(long = "fullscreen")]
     fullscreen: bool,
 
     // The number of occurrences of the `v/verbose` flag
@@ -38,9 +38,9 @@ struct Opt {
     #[structopt(short = "s", long = "fps", default_value = "60")]
     fps: i32,
 
-    // /// Output file
-    // #[structopt(short = "o", long = "output", parse(from_os_str))]
-    // output: PathBuf,
+    /// Font file
+    #[structopt(short = "f", long = "font", default_value = "./fonts/Cheepicus_8x8x2.png", parse(from_os_str))]
+    font: PathBuf,
 
     // /// Number of cars
     // #[structopt(short = "c", long = "nb-cars")]
@@ -61,7 +61,7 @@ fn main() {
     // Init the root window here. All other settings fallback to default
     let root = Root::initializer()
 	.font(
-	    "./fonts/DarkondDigsDeeper_16x16.png",
+	    opt.font,
 	    // "./fonts/Phoebus_16x16.png",
             // "./fonts/Hermano.png",
 	    FontLayout::AsciiInRow,

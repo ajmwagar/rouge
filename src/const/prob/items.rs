@@ -12,17 +12,40 @@ pub const MAX_ITEMS: &[Transition] = &[
     Transition { level: 6, value: 4 },
 ];
 
+/*
+ * Spells
+ */
+
 /// Chances of a lightning spell spawning
-pub const LIGHTNING_WEIGHTS: &[Transition] = &[Transition {
-    level: 4,
-    value: 25,
-}];
+pub const LIGHTNING_WEIGHTS: &[Transition] = &[
+    Transition { level: 4, value: 25, }
+];
 
 /// Chances of a fireball spell spawning
-pub const FIREBALL_WEIGHTS: &[Transition] = &[Transition {
-    level: 6,
-    value: 25,
-}];
+pub const FIREBALL_WEIGHTS: &[Transition] = &[
+    Transition { level: 6, value: 25 }
+];
+
+/// Chances of a confuse spell spawning
+pub const CONFUSE_WEIGHTS: &[Transition] = &[
+    Transition { level: 2, value: 10, }
+];
+
+/*
+ * Equipment
+ */
+
+/// Chances of a cloth tier item spawning
+pub const CLOTH_WEIGHTS: &[Transition] = &[
+    Transition { level: 2, value: 10, }
+];
+
+/// Chances of a leather tier item spawning
+pub const LEATHER_WEIGHTS: &[Transition] = &[
+    Transition { level: 4, value: 10, }
+];
+
+
 
 /*
  * Weighted Values

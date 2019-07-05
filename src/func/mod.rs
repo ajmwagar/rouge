@@ -191,7 +191,7 @@ Defense: {}",
 }
 
 pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
-    let namegen = setup_namegen();
+    let mut namegen = setup_namegen();
     // fill map with "blocked" tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
@@ -234,7 +234,7 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
             create_room(new_room, &mut map);
 
             // add some content to this room, such as monsters
-            place_objects(new_room, objects, &mut map, level as u32);
+            place_objects(new_room, objects, &mut map, level as u32, &mut namegen);
 
             // center coordinates of the new room, will be useful later
             let (new_x, new_y) = new_room.center();
@@ -593,8 +593,6 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                     (true, false) => COLOR_LIGHT_GROUND,
                 };
 
-                // let color = tcod::colors::WHITE;
-
                 let explored = &mut game.map[x as usize][y as usize].explored;
                 if visible {
                     // since it's visible, explore it
@@ -604,10 +602,8 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                     // show explored tiles only (any visible tile is explored already)
                     // con.set_char_background(x, y, color, color, tcod::colors::BLACK);
                     if wall {
-                        // TODO Determine type of wall to place
-
-
-                        let mut north = false; let mut south = false; let mut east = false; let mut west = false; 
+                        // let mut north = false; let mut south = false; let mut east = false; let mut west = false; 
+                        let (mut north, mut south, mut east, mut west) = (false, false, false, false);
                         // Get surrounding walls
 
                         // North overflow protection
@@ -623,7 +619,6 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                         }
 
                         if game.map.len() > (x + 1) as usize {
-                            east = game.map[(x + 1) as usize][y as usize].block_sight;
                             let east_block = game.map[(x + 1) as usize][y as usize];
                             east = east_block.block_sight && east_block.explored;
                         }
@@ -633,8 +628,6 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                             west = west_block.block_sight && west_block.explored;
                         }
 
-
-                        // tcod.con.set_default_foreground(color);
                         // Match character to render
                         match (north, east, south, west) {
 
@@ -643,14 +636,13 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                             // Sides
 
                             // Vertical Side
-                            // (true, _, true, _) => tcod.con.put_char_ex(x, y, 204 as char, color, tcod::colors::BLACK),
                             (_, false, _, false) => tcod.con.put_char_ex(x, y, V_WALL, color, tcod::colors::BLACK),
 
                             // Horizontal side
                             (false, _, false, _) => tcod.con.put_char_ex(x, y, H_WALL, color, tcod::colors::BLACK),
 
+                            // T Shapes
 
-                            // // T Shapes
                             // East_T
                             (true,true,true,false) => tcod.con.put_char_ex(x, y, 204 as char, color, tcod::colors::BLACK),
 
@@ -676,12 +668,8 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
 
                             // Bottom right shape
                             (_, _, true, true) => tcod.con.put_char_ex(x, y, BR_WALL, color, tcod::colors::BLACK),
-
-
-
                         }
                     } else {
-                        tcod.con.set_default_foreground(color);
                         tcod.con.put_char_ex(x, y, FLOOR, color, tcod::colors::BLACK);
                     }
                 }
