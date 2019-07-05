@@ -1,9 +1,11 @@
 use super::*;
 use crate::r#const::COLOR_DARK_GROUND;
 use crate::r#const::FLOOR;
+use crate::func::is_blocked;
+use crate::r#const::{MAP_WIDTH, MAP_HEIGHT};
 
 // Object in the game
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(PartialEq, Serialize, Deserialize, Debug, Clone)]
 /// An object in the game
 pub struct Object {
     pub x: i32,
@@ -193,10 +195,77 @@ impl Object {
         (self.x, self.y)
     }
 
+
     /// Set the position of an object
     pub fn set_pos(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;
+    }
+
+    pub fn move_towards(&mut self, target: &Object, map: &Map, objects: &[Object]) {
+        let dx = target.x-  self.x;
+        let dy = target.y - self.y;
+
+        let distance = ((dx.pow(2) + dy.pow(2)) as f32).sqrt();
+
+        // normalize it to length 1 (preserving direction), then round it and
+        // convert to integer so the movement is restricted to the map grid
+        let dx = (dx as f32 / distance).round() as i32;
+        let dy = (dy as f32 / distance).round() as i32;
+        if !is_blocked(self.x + dx, self.y + dy, map, objects) {
+            self.move_by(dx, dy);
+        }
+        
+        
+
+    }
+
+    pub fn move_astar(&mut self, target: &Object, map: &Map, objects: &[Object]) {
+        let mut fov = tcod::Map::new(MAP_WIDTH, MAP_HEIGHT);
+
+        for y1 in 0..MAP_HEIGHT {
+            for x1 in 0..MAP_WIDTH {
+                let tile = map[x1 as usize][y1 as usize];
+                fov.set(x1, y1, !tile.block_sight, !tile.blocked);
+            }
+        }
+
+        for obj in objects {
+            if obj.blocks && obj != self && obj != target {
+                fov.set(obj.x, obj.y, true, false);
+            }
+        }
+
+        let mut my_path = tcod::pathfinding::AStar::new_from_map(fov, 1.41);
+
+        my_path.find((self.x, self.y), (target.x, target.y));
+
+        println!("Path dest: {:?}", my_path.destination());
+        println!("Path origin: {:?}", my_path.origin());
+
+        if !my_path.is_empty() && my_path.len() < 25 {
+            println!("Using A* Path");
+            match my_path.walk_one_step(true) {
+                None => {},
+                Some((x,y)) => {
+                    self.x = x;
+                    self.y = y;
+                }
+            }
+        }
+        else {
+            println!("Failing Back to move_towards");
+            self.move_towards(target, map, objects);
+        }
+
+    }
+
+
+
+    /// Move the player/fighter
+    pub fn move_by(&mut self, dx: i32, dy: i32) {
+        let (x, y) = self.pos();
+        self.set_pos(x + dx, y + dy);
     }
 
     /// Object constructor
@@ -220,8 +289,8 @@ impl Object {
 
     /// set the color and then draw the character that represents this object at its position
     pub fn draw(&self, con: &mut Console) {
-        con.set_default_foreground(self.color);
-        con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
+        // con.set_default_foreground(self.color);
+        con.put_char_ex(self.x, self.y, self.char, self.color, tcod::colors::BLACK);
     }
 
     /// Erase the character that represents this object

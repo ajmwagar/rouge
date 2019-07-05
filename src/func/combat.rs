@@ -271,7 +271,9 @@ pub fn player_move_or_attack(dx: i32, dy: i32, objects: &mut [Object], game: &mu
             player.attack(target, game);
         }
         None => {
-            move_by(PLAYER, dx, dy, &mut game.map, objects);
+            if !is_blocked(objects[PLAYER].x + dx, objects[PLAYER].y + dy, &game.map, objects) { 
+                objects[PLAYER].move_by(dx, dy);
+            }
         }
     }
 }
@@ -304,15 +306,15 @@ pub fn ai_basic(
     fov_map: &FovMap,
 ) -> Ai {
     // a basic monster takes its turn. If you can see it, it can see you
-    let (monster_x, monster_y) = objects[monster_id].pos();
-    if fov_map.is_in_fov(monster_x, monster_y) {
+    if fov_map.is_in_fov(objects[monster_id].x, objects[monster_id].y) {
         if objects[monster_id].distance_to(&objects[PLAYER]) >= 2.0 {
+            let cloned_obj = &objects.to_vec().clone();
+            let (player, monster) = mut_two(PLAYER, monster_id, objects);
             // move towards player if far away
-            let (player_x, player_y) = objects[PLAYER].pos();
-            move_towards(monster_id, player_x, player_y, &mut game.map, objects);
+            monster.move_astar(&player, &mut game.map, &cloned_obj);
         } else if objects[PLAYER].fighter.map_or(false, |f| f.hp > 0) {
             // close enough, attack! (if the player is still alive.)
-            let (monster, player) = mut_two(monster_id, PLAYER, objects);
+            let (player, monster) = mut_two(PLAYER, monster_id, objects);
             monster.attack(player, game);
         }
     }
@@ -330,8 +332,7 @@ pub fn ai_confused(
     if num_turns >= 0 {
         // still confused ...
         // move in a random idrection, and decrease the number of turns confused
-        move_by(
-            monster_id,
+        move_by(monster_id,
             rand::thread_rng().gen_range(-1, 2),
             rand::thread_rng().gen_range(-1, 2),
             map,
@@ -351,16 +352,4 @@ pub fn ai_confused(
         );
         *previous_ai
     }
-}
-pub fn move_towards(id: usize, target_x: i32, target_y: i32, map: &Map, objects: &mut [Object]) {
-    // vector from this object to the target, and distance
-    let dx = target_x - objects[id].x;
-    let dy = target_y - objects[id].y;
-    let distance = ((dx.pow(2) + dy.pow(2)) as f32).sqrt();
-
-    // normalize it to length 1 (preserving direction), then round it and
-    // convert to integer so the movement is restricted to the map grid
-    let dx = (dx as f32 / distance).round() as i32;
-    let dy = (dy as f32 / distance).round() as i32;
-    move_by(id, dx, dy, map, objects);
 }

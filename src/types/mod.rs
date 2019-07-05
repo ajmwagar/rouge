@@ -24,7 +24,7 @@ pub use self::slot::Slot;
 pub use self::tile::Tile;
 
 // Smaller types
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(PartialEq, Serialize, Deserialize, Debug, Clone)]
 /// Enemy AI types
 pub enum Ai {
     Basic,

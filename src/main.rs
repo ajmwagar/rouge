@@ -61,8 +61,9 @@ fn main() {
     // Init the root window here. All other settings fallback to default
     let root = Root::initializer()
 	.font(
-	    // "./fonts/DarkondDigsDeeper_16x16.png",
-	    "./fonts/Cheepicus_8x8x2.png",
+	    "./fonts/DarkondDigsDeeper_16x16.png",
+	    // "./fonts/Phoebus_16x16.png",
+            // "./fonts/Hermano.png",
 	    FontLayout::AsciiInRow,
 	    )
 	.font_type(FontType::Default)

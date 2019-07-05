@@ -593,6 +593,8 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                     (true, false) => COLOR_LIGHT_GROUND,
                 };
 
+                // let color = tcod::colors::WHITE;
+
                 let explored = &mut game.map[x as usize][y as usize].explored;
                 if visible {
                     // since it's visible, explore it
@@ -600,7 +602,7 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                 }
                 if *explored {
                     // show explored tiles only (any visible tile is explored already)
-                    // con.set_char_background(x, y, color, BackgroundFlag::Set);
+                    // con.set_char_background(x, y, color, color, tcod::colors::BLACK);
                     if wall {
                         // TODO Determine type of wall to place
 
@@ -632,55 +634,55 @@ pub fn render_all(tcod: &mut Tcod, objects: &[Object], game: &mut Game, fov_reco
                         }
 
 
-                        tcod.con.set_default_foreground(color);
+                        // tcod.con.set_default_foreground(color);
                         // Match character to render
                         match (north, east, south, west) {
 
-                            (true,true,true,true) => tcod.con.put_char(x, y, (H_WALL as u8 + 17 - 3) as char, BackgroundFlag::Set),
+                            (true,true,true,true) => tcod.con.put_char_ex(x, y, (H_WALL as u8 + 17 - 3) as char, color, tcod::colors::BLACK),
 
                             // Sides
 
                             // Vertical Side
-                            // (true, _, true, _) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
-                            (_, false, _, false) => tcod.con.put_char(x, y, V_WALL, BackgroundFlag::Set),
+                            // (true, _, true, _) => tcod.con.put_char_ex(x, y, 204 as char, color, tcod::colors::BLACK),
+                            (_, false, _, false) => tcod.con.put_char_ex(x, y, V_WALL, color, tcod::colors::BLACK),
 
                             // Horizontal side
-                            (false, _, false, _) => tcod.con.put_char(x, y, H_WALL, BackgroundFlag::Set),
+                            (false, _, false, _) => tcod.con.put_char_ex(x, y, H_WALL, color, tcod::colors::BLACK),
 
 
                             // // T Shapes
                             // East_T
-                            (true,true,true,false) => tcod.con.put_char(x, y, 204 as char, BackgroundFlag::Set),
+                            (true,true,true,false) => tcod.con.put_char_ex(x, y, 204 as char, color, tcod::colors::BLACK),
 
                             // West_T
-                            (true,false,true,true) => tcod.con.put_char(x, y, 185 as char, BackgroundFlag::Set),
+                            (true,false,true,true) => tcod.con.put_char_ex(x, y, 185 as char, color, tcod::colors::BLACK),
 
                             // North_T
-                            (true,true,false,true) => tcod.con.put_char(x, y, 203 as char, BackgroundFlag::Set),
+                            (true,true,false,true) => tcod.con.put_char_ex(x, y, 203 as char, color, tcod::colors::BLACK),
 
                             // South_T
-                            (false,true,true,true) => tcod.con.put_char(x, y, 202 as char, BackgroundFlag::Set),
+                            (false,true,true,true) => tcod.con.put_char_ex(x, y, 202 as char, color, tcod::colors::BLACK),
 
                             // Corners
 
                             // Top left shape
-                            (true, true, _, _) => tcod.con.put_char(x, y, TL_WALL, BackgroundFlag::Set),
+                            (true, true, _, _) => tcod.con.put_char_ex(x, y, TL_WALL, color, tcod::colors::BLACK),
 
                             // Bottom left shape
-                            (_, true, true, _) => tcod.con.put_char(x, y, BL_WALL, BackgroundFlag::Set),
+                            (_, true, true, _) => tcod.con.put_char_ex(x, y, BL_WALL, color, tcod::colors::BLACK),
 
                             // Top right shape
-                            (true, _, _, true) => tcod.con.put_char(x, y, TR_WALL, BackgroundFlag::Set),
+                            (true, _, _, true) => tcod.con.put_char_ex(x, y, TR_WALL, color, tcod::colors::BLACK),
 
                             // Bottom right shape
-                            (_, _, true, true) => tcod.con.put_char(x, y, BR_WALL, BackgroundFlag::Set),
+                            (_, _, true, true) => tcod.con.put_char_ex(x, y, BR_WALL, color, tcod::colors::BLACK),
 
 
 
                         }
                     } else {
                         tcod.con.set_default_foreground(color);
-                        tcod.con.put_char(x, y, FLOOR, BackgroundFlag::Set);
+                        tcod.con.put_char_ex(x, y, FLOOR, color, tcod::colors::BLACK);
                     }
                 }
             }
