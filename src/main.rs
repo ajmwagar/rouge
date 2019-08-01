@@ -68,11 +68,14 @@ fn main() {
 	    )
 	.font_type(FontType::Default)
 	.font_dimensions(16, 16)
+        .renderer(Renderer::GLSL)
 	.size(SCREEN_WIDTH, SCREEN_HEIGHT)
 	.title(GAME_TITLE)
 	.fullscreen(opt.fullscreen)
 	.init();
 
+
+    println!("SDL init");
 
     // Create the Tcod instance
     let mut tcod = Tcod {
@@ -96,5 +99,6 @@ fn main() {
 
     sink.append(source);
 
+    println!("Main Menu init");
     main_menu(&mut tcod);
 }

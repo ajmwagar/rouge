@@ -476,6 +476,7 @@ pub fn main_menu(tcod: &mut Tcod) {
         .expect("Background image not found");
 
     while !tcod.root.window_closed() {
+        println!("Loop");
         // show the background image, at twice the regular console resolution
         tcod::image::blit_2x(&img, (0, 0), (-1, -1), &mut tcod.root, (0, 0));
 
