@@ -70,6 +70,6 @@ pub fn next_level(tcod: &mut Tcod, objects: &mut Vec<Object>, game: &mut Game) {
 
     objects[PLAYER].fighter.as_mut().unwrap().xp += (game.dungeon_level * LEVEL_XP_MULTIPLIER) as i32;
 
-    game.map = make_map(objects, game.dungeon_level);
+    game.map = make_map(&mut tcod.namegen, objects, game.dungeon_level);
     initialise_fov(&game.map, tcod);
 }

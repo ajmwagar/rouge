@@ -4,6 +4,9 @@ version = "0.1.2"
 authors = ["Avery Wagar <ajmw.subs@gmail.com>"]
 edition = "2018"
 
+[profile.release]
+lto=true
+
 [dependencies]
 tcod = { version = "0.12", features = ["serialization"] }
 rand = "0.3"

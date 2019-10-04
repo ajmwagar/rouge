@@ -4,6 +4,7 @@ use super::*;
 use tcod::colors::{self, Color};
 use tcod::console::*;
 use tcod::map::Map as FovMap;
+use tcod::namegen::Namegen;
 
 use tcod::input::Mouse;
 
@@ -101,6 +102,7 @@ pub struct Tcod {
     pub fov: FovMap,
     /// Mouse location
     pub mouse: Mouse,
+    pub namegen: Namegen
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]

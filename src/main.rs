@@ -84,6 +84,7 @@ fn main() {
 	panel: Offscreen::new(SCREEN_WIDTH, PANEL_HEIGHT),
 	fov: FovMap::new(MAP_WIDTH, MAP_HEIGHT),
 	mouse: Default::default(),
+        namegen: setup_namegen(),
     };
 
     use std::fs::File;

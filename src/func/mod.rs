@@ -42,7 +42,6 @@ pub fn setup_namegen() -> Namegen {
     let rng = Trng::new(Algo::CMWC);
     let mut namegen = Namegen::new().unwrap();
     namegen.parse_with_rng("./assets/namegen/mingos_standard.cfg", &rng);
-    // namegen.parse("./assets/namegen/mingos_standard.cfg");
     namegen
 }
 
@@ -190,8 +189,8 @@ Defense: {}",
     }
 }
 
-pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
-    let mut namegen = setup_namegen();
+
+pub fn make_map(mut namegen: &mut Namegen, objects: &mut Vec<Object>, level: u32) -> Map {
     // fill map with "blocked" tiles
     let mut map = vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize];
 
@@ -342,6 +341,8 @@ pub fn make_map(objects: &mut Vec<Object>, level: u32) -> Map {
     stairs.always_visible = true;
     objects.push(stairs);
 
+
+    drop(namegen);
     map
 }
 
@@ -376,7 +377,7 @@ pub fn new_game(tcod: &mut Tcod) -> (Vec<Object>, Game) {
 
     let mut game = Game {
         // generate map (at this point it's not drawn to the screen)
-        map: make_map(&mut objects, 1),
+        map: make_map(&mut tcod.namegen, &mut objects, 1),
         // create the list of game messages and their colors, starts empty
         log: vec![],
         inventory: vec![],
